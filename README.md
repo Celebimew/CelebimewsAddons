@@ -11,5 +11,6 @@ Chattriggers module for tracking dungeon carries!
 `/stopcarry <client>` - Stop tracking carries for a client.<br>
 ## Party Commands
 `c!price <floor>` - List Skyblock Maniacs (SBM) Prices for a floor.<br>
-`c!pricecheck <floor> <amount>` **(Disabled)**- Calculate the total price for multiple runs on a floor.<br>
-
+`c!calcprice <floor> <amount>` - Calculate the total price for multiple runs on a floor.<br>
+# Bug Reports/Questions
+Please report any bugs in the discord server [Click Here](https://discord.gg/FkJA5Hf7we)
