@@ -248,11 +248,15 @@ function updateCarryProgress(floor) {
     const done = data.done;
     const target = data.target;
 
-    ChatLib.say(`/pc CBA >> ${done}/${target} runs done!`);
+    setTimeout(() => {
+      ChatLib.say(`/pc CBA >> ${done}/${target} runs done!`);
+    }, 2000);
     Client.showTitle(`${done}/${target}`, "", 0, 40, 10);
 
     if (done >= target) {
-      ChatLib.say("/pc CBA >> The requested amounts of carries complete!");
+      setTimeout(() => {
+        ChatLib.say("/pc CBA >> The requested amounts of carries complete!");
+      }, 2000);
       Client.showTitle("Carry Done!", "", 0, 60, 20);
       delete carries[client];
     }
