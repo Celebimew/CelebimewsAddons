@@ -5,7 +5,7 @@ Chattriggers module for tracking dungeon carries!
 2. Run `/ct reload` to reload your modules
 # Commands
 ## Slash Commands
-`/startcarry <floor> <amount> <client>` - Start tracking carries for a client.
-`/listcarries` - Lists all active carries.
-`/stopcarry <client>` - Stop tracking carries for a client.
+`/startcarry <floor> <amount> <client>` - Start tracking carries for a client.<br>
+`/listcarries` - Lists all active carries.<br>
+`/stopcarry <client>` - Stop tracking carries for a client.<br>
 ## Party Commands
