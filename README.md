@@ -1,9 +1,12 @@
 # Celebimews Addons
 Chattriggers module for tracking dungeon carries!
 # How to install
+## Manual Install
 1. Install [Chattriggers](https://chattriggers.com/)
 2. Put the CBAddons folder to your chattriggers module folder
 3. Run `/ct reload` to reload your modules
+## In-game Command
+(Still pending verification)
 # Commands
 ## Slash Commands
 `/startcarry <floor> <amount> <client>` - Start tracking carries for a client.<br>
