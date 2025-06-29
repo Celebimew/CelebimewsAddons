@@ -47,7 +47,7 @@ register("gameLoad", () => {
 });
 
 register("serverConnect", () => {
-  checkForUpdates();
+  Client.scheduleTask(100, checkForUpdates);
 });
 
 const PREFIX = "c!";
