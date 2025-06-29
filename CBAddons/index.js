@@ -46,6 +46,10 @@ register("gameLoad", () => {
   checkForUpdates();
 });
 
+register("serverConnect", () => {
+  checkForUpdates();
+});
+
 const PREFIX = "c!";
 const partyOnly = true;
 
