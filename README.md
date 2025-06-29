@@ -9,9 +9,11 @@ Chattriggers module for tracking dungeon carries!
 (Still pending verification)
 # Commands
 ## Slash Commands
+### General
 `/cba` - Open the config GUI.<br>
 `/price <floor>` - List Skyblock Maniacs (SBM) Prices for a floor.<br>
 `/calprice <floor> <amount>` - Calculate the total price for multiple runs on a floor.<br>
+### Carry Tracking
 `/startcarry <floor> <amount> <client>` - Start tracking carries for a client.<br>
 `/listcarries` - Lists all active carries.<br>
 `/stopcarry <client>` - Stop tracking carries for a client.<br>
