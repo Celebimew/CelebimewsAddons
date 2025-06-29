@@ -315,6 +315,101 @@ register("command", (subcommand, floorArg) => {
   updateCarryProgress(floor);
 }).setName("cbadebug");
 
+register("command", (...args) => {
+  const floor = args[0]?.toLowerCase();
+  if (!floor) {
+    ChatLib.chat("§9§l[§a§lCBA§9§l] §cUsage: /price <floor>");
+    return;
+  }
+
+  const result = priceMap[floor];
+  if (result) {
+    ChatLib.chat(`§9§l[§a§lCBA§9§l] §aSBM price for §d${floor.toUpperCase()}§a: §e${result}`);
+  } else {
+    ChatLib.chat(`§9§l[§a§lCBA§9§l] §cUnknown floor: ${floor}`);
+  }
+}).setName("price");
+
+register("command", (...args) => {
+  try {
+    const floor = ChatLib.removeFormatting(args[0] || "").toLowerCase().trim();
+    const amountRaw = args[1];
+    const amount = parseInt(amountRaw);
+
+    if (!floor || isNaN(amount)) {
+      ChatLib.chat(`§cCBA >> Invalid floor or amount. floor: ${floor}, amountRaw: ${amountRaw}`);
+      ChatLib.chat("§9§l[§a§lCBA§9§l] §cUsage: /calcprice <floor> <amount>");
+      return;
+    }
+
+    const over5 = amount >= 5;
+    const format = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    let comp = 0, s = 0, sp = 0, result = "";
+
+    switch (floor) {
+      case "f4":
+        comp = format((over5 ? 500000 : 600000) * amount);
+        s = format((over5 ? 700000 : 850000) * amount);
+        result = `${comp} || ${s} || No data`;
+        break;
+      case "f5":
+        comp = format((over5 ? 500000 : 600000) * amount);
+        s = format((over5 ? 650000 : 750000) * amount);
+        sp = format((over5 ? 1000000 : 1200000) * amount);
+        result = `${comp} || ${s} || ${sp}`;
+        break;
+      case "f6":
+        comp = format((over5 ? 600000 : 700000) * amount);
+        s = format((over5 ? 850000 : 1000000) * amount);
+        sp = format((over5 ? 1200000 : 1400000) * amount);
+        result = `${comp} || ${s} || ${sp}`;
+        break;
+      case "f7":
+        comp = format((over5 ? 4000000 : 5000000) * amount);
+        s = format((over5 ? 8250000 : 9500000) * amount);
+        sp = format((over5 ? 10500000 : 12000000) * amount);
+        result = `${comp} || ${s} || ${sp}`;
+        break;
+      case "m1":
+        s = format((over5 ? 1000000 : 1250000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m2":
+        s = format((over5 ? 2200000 : 2500000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m3":
+        s = format((over5 ? 3600000 : 4000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m4":
+        s = format(15000000 * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m5":
+        s = format((over5 ? 5250000 : 5750000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m6":
+        s = format((over5 ? 6750000 : 8000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m7":
+        s = format((over5 ? 30000000 : 35000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      default:
+        ChatLib.chat(`§9§l[§a§lCBA§9§l] §cUnknown floor: ${floor}`);
+        return;
+    }
+
+    ChatLib.chat(`§9§l[§a§lCBA§9§l] §aSBM Price for §d${amount} ${floor.toUpperCase()}§a runs: §e${result}`);
+  } catch (err) {
+    ChatLib.chat(`§cCBA >> [Error: calcprice] ${err}`);
+    console.error(err);
+  }
+}).setName("calcprice");
 
 register("chat", (time) => updateCarryProgress("f1")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cBonzo &r&ein &r&a${time}&r");
 register("chat", (time) => updateCarryProgress("f2")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cScarf &r&ein &r&a${time}&r");
