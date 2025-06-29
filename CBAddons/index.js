@@ -1,3 +1,51 @@
+const version = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
+ChatLib.chat(`&9&l[&a&lCBA&9&l] &aYou are running Celebimew's Addons &d&lV.${version}`);
+import config from "./config";
+
+register("command", () => {
+  config.openGUI();
+  ChatLib.chat("&9&l[&a&lCBA&9&l] &aOpening config GUI...");
+}).setName("cba");
+
+function checkForUpdates() {
+  const CURRENT_VERSION = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
+  const { request } = require("requestV2");
+
+  request({
+    url: "https://api.github.com/repos/Celebimew/CelebimewsAddons/releases/latest",
+    headers: {
+      "User-Agent": "CBAddons"
+    }
+  })
+    .then(res => {
+      const data = JSON.parse(res);
+      const tag = data.tag_name;
+      const match = tag.match(/Release_V\.(\d+\.\d+\.\d+)/);
+
+      if (!match) {
+        ChatLib.chat("&c&l[CBAddons] &cCould not parse the latest version tag.");
+        return;
+      }
+
+      const latest = match[1];
+
+      if (CURRENT_VERSION === latest) {
+        ChatLib.chat(`&a&l[CBAddons] &aYou're on the latest version: &d&l${CURRENT_VERSION}`);
+      } else {
+        ChatLib.chat(`&6[CBAddons] Update available!`);
+        ChatLib.chat(`&eCurrent: &d&l${CURRENT_VERSION} &8| &aLatest: &d&l${latest}`);
+        ChatLib.chat(`https://github.com/Celebimew/CelebimewsAddons/releases/latest`);
+      }
+    })
+    .catch(e => {
+      ChatLib.chat("&c&l[CBAddons] &cFailed to check for updates.");
+    });
+}
+
+register("gameLoad", () => {
+  checkForUpdates();
+});
+
 const PREFIX = "c!";
 const partyOnly = true;
 
@@ -133,6 +181,7 @@ calcprice: (args) => {
 const myUsername = Player.getName();
 
 register("chat", (level, chatType, emblem, rank, username, ironman, message) => {
+  if (!config.party_commands) return;
   if (chatType !== "Party > ") return;
   if (username === myUsername) return;
   if (!message.startsWith(PREFIX)) return;
@@ -143,6 +192,7 @@ register("chat", (level, chatType, emblem, rank, username, ironman, message) => 
 register("messageSent", (msg, event) => {
   if (!msg.startsWith(PREFIX)) return;
   if (partyOnly && !msg.startsWith("c!")) return;
+  if (!config.party_commands) return;
 
   handleCommand(msg);
 });
@@ -197,6 +247,11 @@ register("command", (floor, amount, client) => {
 }).setName("startcarry");
 
 register("command", () => {
+  ChatLib.chat("&b[CBA] Opening config GUI...");
+  config.openGUI();
+}).setName("cba")
+
+register("command", () => {
   if (Object.keys(carries).length === 0) return ChatLib.chat("§cCBA >> No active carries.");
   ChatLib.chat("§eActive Carries:");
   Object.entries(carries).forEach(([client, data]) => {
@@ -230,6 +285,33 @@ register("worldLoad", () => {
   dungeonStarted = false;
 });
 
+register("command", (subcommand, floorArg) => {
+  if (!subcommand || subcommand.toLowerCase() !== "carrytracker") {
+    ChatLib.chat("&c&lCBA >> &cUsage: /cbadebug carrytracker <f1-f7/m1-m7>");
+    return;
+  }
+
+  const floor = floorArg?.toLowerCase();
+  const validFloors = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "m1", "m2", "m3", "m4", "m5", "m6", "m7"];
+
+  if (!validFloors.includes(floor)) {
+    ChatLib.chat("&c&lCBA >> &cInvalid floor: " + floor);
+    return;
+  }
+
+  const testClient = "DebugClient";
+
+  carries[testClient] = {
+    floor: floor,
+    done: 0,
+    target: 1
+  };
+
+  ChatLib.chat(`&a&lCBA >> &aSimulating carry for &d${floor.toUpperCase()} &awith test client.`);
+  updateCarryProgress(floor);
+}).setName("cbadebug");
+
+
 register("chat", (time) => updateCarryProgress("f1")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cBonzo &r&ein &r&a${time}&r");
 register("chat", (time) => updateCarryProgress("f2")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cScarf &r&ein &r&a${time}&r");
 register("chat", (time) => updateCarryProgress("f3")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cThe Professor &r&ein &r&a${time}&r");
@@ -238,8 +320,16 @@ register("chat", (time) => updateCarryProgress("f5")).setChatCriteria("${*}&r&c�
 register("chat", (time) => updateCarryProgress("f6")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cSadan &r&ein &r&a${time}&r");
 register("chat", (time) => updateCarryProgress("f7")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cNecron &r&ein &r&a${time}&r");
 
+const floorCooldowns = {};
+
 function updateCarryProgress(floor) {
   if (Object.keys(carries).length === 0) return;
+
+  const now = Date.now();
+  const lastTrigger = floorCooldowns[floor] || 0;
+
+  if (now - lastTrigger < 30000) return;
+  floorCooldowns[floor] = now;
 
   Object.entries(carries).forEach(([client, data]) => {
     if (data.floor !== floor || data.done >= data.target) return;
@@ -249,16 +339,114 @@ function updateCarryProgress(floor) {
     const target = data.target;
 
     setTimeout(() => {
-      ChatLib.say(`/pc CBA >> ${done}/${target} runs done!`);
+      ChatLib.say(`/pc CBA >> ${done}/${target} runs done for ${client}!`);
     }, 2000);
     Client.showTitle(`${done}/${target}`, "", 0, 40, 10);
 
     if (done >= target) {
       setTimeout(() => {
-        ChatLib.say("/pc CBA >> The requested amounts of carries complete!");
+        ChatLib.say(`/pc CBA >> The requested amounts of carries for ${client} complete!`);
       }, 2000);
       Client.showTitle("Carry Done!", "", 0, 60, 20);
       delete carries[client];
+
+      if (config.discord_integration) {
+        const webhookURL = config.discord_webhook_url?.trim();
+        if (!webhookURL || !/^https:\/\/discord\.com\/api\/webhooks\//.test(webhookURL)) {
+          ChatLib.chat("&c&lCBA >> &cInvalid webhook URL! Please edit this in the config menu (/cba)");
+        } else {
+          try {
+            const payload = JSON.stringify({
+              embeds: [{
+                title: "Carry Tracker",
+                description: `Carry tracker for **${client}**\nFloor: **${floor.toUpperCase()}**\nCarries: **${done}/${target}**`,
+                footer: { text: "Celebimew's Addons Carry Tracker" },
+                color: 0x00FF00
+              }]
+            });
+
+            const connection = new java.net.URL(webhookURL).openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+
+            const outputStream = connection.getOutputStream();
+            outputStream.write(new java.lang.String(payload).getBytes("UTF-8"));
+            outputStream.close();
+
+            const responseCode = connection.getResponseCode();
+            if (responseCode === 204) {
+              ChatLib.chat("&a&lCBA >> &aWebhook sent successfully.");
+            } else {
+              ChatLib.chat(`&c&lCBA >> &cWebhook error (code ${responseCode})`);
+            }
+          } catch (e) {
+            ChatLib.chat(`&c&lCBA >> &cWebhook failed: ${e}`);
+          }
+        }
+      }
+    }
+
+    if (config.auto_requeue && data.done < data.target) {
+      const floorCommandMap = {
+        f1: "/joininstance catacombs_floor_one",
+        f2: "/joininstance catacombs_floor_two",
+        f3: "/joininstance catacombs_floor_three",
+        f4: "/joininstance catacombs_floor_four",
+        f5: "/joininstance catacombs_floor_five",
+        f6: "/joininstance catacombs_floor_six",
+        f7: "/joininstance catacombs_floor_seven"
+      };
+
+      const command = floorCommandMap[floor.toLowerCase()];
+      if (command) {
+        setTimeout(() => {
+          ChatLib.command(command.substring(1));
+        }, 3000);
+      }
     }
   });
 }
+register("command", () => {
+  ChatLib.chat("&6&lCBA >> &6Webhook test command triggered.");
+
+  if (!config.discord_integration) {
+    ChatLib.chat("&c&lCBA >> &cDiscord integration is disabled in config.");
+    return;
+  }
+
+  const webhookURL = config.discord_webhook_url?.trim();
+  if (!webhookURL || !/^https:\/\/discord\.com\/api\/webhooks\//.test(webhookURL)) {
+    ChatLib.chat("&c&lCBA >> &cInvalid webhook URL! Please edit this in the config menu (/cba)");
+    return;
+  }
+
+  try {
+    const payload = JSON.stringify({
+      embeds: [{
+        title: "Test Webhook",
+        description: "This is a test message from CBAddons.",
+        footer: { text: "Celebimew's Addons Carry Tracker" },
+        color: 0x00FF00
+      }]
+    });
+
+    const connection = new java.net.URL(webhookURL).openConnection();
+    connection.setDoOutput(true);
+    connection.setRequestMethod("POST");
+    connection.setRequestProperty("Content-Type", "application/json");
+
+    const outputStream = connection.getOutputStream();
+    outputStream.write(new java.lang.String(payload).getBytes("UTF-8"));
+    outputStream.close();
+
+    const responseCode = connection.getResponseCode();
+    if (responseCode === 204) {
+      ChatLib.chat("&a&lCBA >> &aWebhook test sent successfully.");
+    } else {
+      ChatLib.chat(`&c&lCBA >> &cWebhook test error (code ${responseCode})`);
+    }
+  } catch (e) {
+    ChatLib.chat(`&c&lCBA >> &cWebhook test failed: ${e}`);
+  }
+}).setName("cbatestwebhook");
