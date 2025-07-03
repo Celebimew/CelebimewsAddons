@@ -8,7 +8,7 @@ import {
 
 @Vigilant("CBAddons", "Celebimew's Addons", {
   getCategoryComparator: () => (a, b) => {
-    const order = ["Config", "Commands", "Other"];
+    const order = ["Config", "Dungeons", "Commands", "Discord", "Other"];
     return order.indexOf(a.name) - order.indexOf(b.name);
   }
 })
@@ -78,14 +78,69 @@ class Settings {
   })
   gui_mode = 0;
 
-  @ButtonProperty({
-    name: "Listcarries Command",
-    description: "Executes: /listcarries",
-    category: "Commands",
-    placeholder: "List Active Carries"
+  @SwitchProperty({
+    name: "Enable Dungeon Sacks Shortcut",
+    description: "Enable dungeon sacks shortcut commands like /boom or /sl.",
+    category: "Dungeons"
   })
-  sayHello() {
-    ChatLib.command("listcarries", true);
+  dungeon_sacks_commands = true;
+
+  @SwitchProperty({
+    name: "Enable Discord Rich Presence (Coming Soon)",
+    description: "Enable or disable Discord Rich Presence.",
+    category: "Discord"
+  })
+  discord_rps = false;
+
+  @SelectorProperty({
+    name: "Discord Rich Presence Type",
+    description: "Select which type of Discord Rich Presence to use.",
+    category: "Discord",
+    options: ["Floor_1", "Floor_2", "Floor_3", "Floor_4", "Floor_5", "Floor_6", "Floor_7", "Master_1", "Master_2", "Master_3", "Master_4", "Master_5", "Master_6", "Master_7"]
+  })
+  discord_rps_type = 0;
+
+  @ButtonProperty({
+    name: "General Commands",
+    description: "Executes: /cba help_1",
+    category: "Commands",
+    placeholder: "Open"
+  })
+  commandsGeneral() {
+    ChatLib.command("cba help_1", true);
+    Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
+  }
+
+  @ButtonProperty({
+    name: "Carry Commands",
+    description: "Executes: /cba help_2",
+    category: "Commands",
+    placeholder: "Open"
+  })
+  commandsCarry() {
+    ChatLib.command("cba help_2", true);
+    Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
+  }
+
+  @ButtonProperty({
+    name: "Sacks Commands",
+    description: "Executes: /cba help_3",
+    category: "Commands",
+    placeholder: "Open"
+  })
+  commandsSacks() {
+    ChatLib.command("cba help_3", true);
+    Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
+  }
+
+  @ButtonProperty({
+    name: "Party Commands",
+    description: "Executes: /cba help_4",
+    category: "Commands",
+    placeholder: "Open"
+  })
+  commandsParty() {
+    ChatLib.command("cba help_4", true);
     Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
   }
 
