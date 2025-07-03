@@ -2,10 +2,90 @@ const version = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
 ChatLib.chat(`&9&l[&a&lCBA&9&l] &aYou are running Celebimew's Addons &d&lV.${version}`);
 import config from "./config";
 
-register("command", () => {
-  config.openGUI();
-  ChatLib.chat("&9&l[&a&lCBA&9&l] &aOpening config GUI...");
+function suggestable(text, suggestion, hoverText) {
+  const msg = new TextComponent(text);
+  msg.setClick("suggest_command", suggestion);
+  if (hoverText) msg.setHover("show_text", hoverText);
+  return msg;
+}
+
+function clickable(text, command, hoverText) {
+  const msg = new TextComponent(text);
+  msg.setClick("run_command", command);
+  msg.setHover("show_text", hoverText);
+  return msg;
+}
+
+register("command", (...args) => {
+  const sub = (args[0] || "").toLowerCase();
+
+  if (sub === "" || sub === "help" || sub === "help_1") {
+    ChatLib.chat("&e&m===================================");
+    ChatLib.chat("&a&lCelebimew's Addons General Commands: &e&l[1/4]");
+    ChatLib.chat(suggestable("§8• §a/cba gui §e- §fOpen config GUI", "/cba gui", "§aClick to paste /cba gui"));
+    ChatLib.chat(suggestable("§8• §a/cba help §e- §fShow this help menu", "/cba help", "§aClick to paste /cba help"));
+    ChatLib.chat(suggestable("§8• §a/cba version §e- §fShow current version", "/cba version", "§aClick to paste /cba version"));
+    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_2", "&cClick to open Help Page 2!"));
+    ChatLib.chat("&e&m===================================");
+    return;
+  }
+
+  if (sub === "help_2") {
+    ChatLib.chat("&e&m===================================");
+    ChatLib.chat("&a&lCelebimew's Addons Carry Commands: &e&l[2/4]");
+    ChatLib.chat(suggestable("§8• §a/startcarry <Floor> <Amount> <Client> §e- §fStart tracking a carry", "/startcarry", "§aClick to paste /startcarry"));
+    ChatLib.chat(suggestable("§8• §a/listcarries §e- §fList all active carries", "/listcarries", "§aClick to paste /listcarries"));
+    ChatLib.chat(suggestable("§8• §a/stopcarry <Client> §e- §f", "/stopcarry", "§aClick to paste /stopcarry"));
+    ChatLib.chat(suggestable("§8• §a/price <Floor> §e- §fList prices for a floor", "/price ", "§7Click to paste /price"));
+    ChatLib.chat(suggestable("§8• §a/calcprice <Floor> <Amount> §e- §fCalculate total prices for a floor", "/calcprice ", "§7Click to paste /calcprice"));
+    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_3", "&cClick to open Help Page 3!"))
+    ChatLib.chat("&e&m===================================");
+    return;
+  }
+
+  if (sub === "help_3") {
+    ChatLib.chat("&e&m===================================");
+    ChatLib.chat("&a&lCelebimew's Addons Sacks Commands: &e&l[3/4]");
+    ChatLib.chat(suggestable("§8• §a/boom §e- §fGet 64 Superboom TNT from dungeon sacks", "/boom", "§aClick to paste /boom"));
+    ChatLib.chat(suggestable("§8• §a/sl §e- §fGet 16 Spirit Leaps from dungeon sacks", "/sl", "§aClick to paste /sl"));
+    ChatLib.chat(suggestable("§8• §a/pearls §e- §fGet 16 Ender Pearls from combat sacks", "/pearls", "§aClick to paste /pearls"));
+    ChatLib.chat(suggestable("§8• §a/draft §e- §fGet 1 Architect's First Draft from dungeon sacks", "/draft", "§aClick to paste /draft"));
+    ChatLib.chat(suggestable("§8• §a/traps §e- §fGet 64 Traps from dungeon sacks", "/traps", "§aClick to paste /traps"));
+    ChatLib.chat(suggestable("§8• §a/decoy §e- §fGet 64 Decoys from dungeon sacks", "/decoy", "§aClick to paste /decoy"));
+    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_4", "&cClick to open Help Page 4!"));
+    ChatLib.chat("&e&m===================================");
+    return;
+  }
+
+  if (sub === "help_4") {
+    ChatLib.chat("&e&m===================================");
+    ChatLib.chat("&a&lCelebimew's Addons Party Commands: &e&l[4/4]");
+    ChatLib.chat(suggestable("§8• §ac!price <Floor> §e- §fList prices for a floor", "c!price ", "§7Click to paste c!price"));
+    ChatLib.chat(suggestable("§8• §ac!calcprice <Floor> <Amount> §e- §fCalculate price totals for a floor", "c!calcprice ", "§7Click to paste c!calcprice"));
+    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_1", "&cClick to open Help Page 1!"));
+    ChatLib.chat("&e&m===================================");
+  }
+
+  if (sub === "version") {
+    const version = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
+    ChatLib.chat(`&9&l[&a&lCBA&9&l] &aYou are running Celebimew's Addons &d&lV.${version}`);
+    return;
+  }
+
+  if (sub === "gui") {
+    config.openGUI();
+    ChatLib.chat("&a&lCBA &a>> &aOpening config GUI...");
+    return;
+  }
+
+  if (sub === "config") {
+    config.openGUI();
+    ChatLib.chat("&a&lCBA &a>> &aOpening config GUI...");
+    return;
+  }
+
 }).setName("cba");
+
 
 function checkForUpdates() {
   const CURRENT_VERSION = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
@@ -288,6 +368,42 @@ register("chat", () => {
 register("worldLoad", () => {
   dungeonStarted = false;
 });
+
+register("command", () => {
+  if (config.dungeon_sacks_commands) {
+    ChatLib.command("gfs spirit_leap 16", false);
+  }
+}).setCommandName("spiritleap").setAliases("sl", "sp", "spl", "spirit", "leaps", "spiritleaps", "leap", "spirit_leap", "spirit_leaps");
+
+register("command", () => {
+  if (config.dungeon_sacks_commands) {
+    ChatLib.command("gfs ender_pearl 16", false);
+  }
+}).setCommandName("enderpearl").setAliases("ep", "epearl", "ender", "pearls", "pearl", "enderpearls", "epearls", "ender_pearls");
+
+register("command", () => {
+  if (config.dungeon_sacks_commands) {
+    ChatLib.command("gfs superboom_tnt 64", false);
+  }
+}).setCommandName("superboom").setAliases("tnt", "boom", "superbooms", "superboomtnt", "super_boom", "superboom_tnt", "superb", "booms");
+
+register("command", () => {
+  if (config.dungeon_sacks_commands) {
+    ChatLib.command("gfs architect_first_draft 1", false);
+  }
+}).setCommandName("architectsdraft").setAliases("draft", "drafts", "architectsdrafts", "architect", "firstdraft");
+
+register("command", () => {
+  if (config.dungeon_sacks_commands) {
+    ChatLib.command("gfs decoy 64", false);
+  }
+}).setCommandName("decoy").setAliases("decoys", "dungeondecoys");
+
+register("command", () => {
+  if (config.dungeon_sacks_commands) {
+    ChatLib.command("gfs trap 64", false);
+  }
+}).setCommandName("trap").setAliases("traps", "dungeontraps", "dungeontrap");
 
 register("command", (subcommand, floorArg) => {
   if (!subcommand || subcommand.toLowerCase() !== "carrytracker") {
