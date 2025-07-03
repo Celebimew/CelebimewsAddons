@@ -33,5 +33,7 @@ Chattriggers module for tracking dungeon carries!
 `c!calcprice <floor> <amount>` - Calculate the total price for multiple runs on a floor.<br>
 ## Guild Commands
 Coming Soon!
+# Discord Rich Presence
+Coming soon!
 # Bug Reports/Questions
 Please report any bugs in the discord server [Click Here](https://discord.gg/FkJA5Hf7we)
