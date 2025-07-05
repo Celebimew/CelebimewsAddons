@@ -84,7 +84,7 @@ register("command", (...args) => {
     return;
   }
 
-}).setName("cba");
+}).setName("cba").setAliases("celebimewsaddons", "celebimewaddons", "cbaddons");
 
 
 function checkForUpdates() {
@@ -310,7 +310,7 @@ register("command", (floor, amount, client) => {
   if (!floorRegex.test(floor)) return ChatLib.chat("§cInvalid floor: " + floor);
   if (floor.startsWith("m")) {
     setTimeout(() => {
-      ChatLib.say("/pc CBA >> Master mode carry tracking not available yet!");
+      ChatLib.chat("&cCBA >> Master mode carry tracking not available yet!");
     }, 500);
     return;
   }
@@ -331,17 +331,12 @@ register("command", (floor, amount, client) => {
 }).setName("startcarry");
 
 register("command", () => {
-  ChatLib.chat("&b[CBA] Opening config GUI...");
-  config.openGUI();
-}).setName("cba")
-
-register("command", () => {
   if (Object.keys(carries).length === 0) return ChatLib.chat("§cCBA >> No active carries.");
   ChatLib.chat("§eActive Carries:");
   Object.entries(carries).forEach(([client, data]) => {
     ChatLib.chat(`§b• ${client}: ${data.floor.toUpperCase()} ${data.done}/${data.target}`);
   });
-}).setName("listcarries");
+}).setName("listcarries").setAliases("listcarry");
 
 register("command", (client) => {
   if (!client) return ChatLib.chat("§cCBA >> Usage: /stopcarry <client>");
@@ -352,7 +347,7 @@ register("command", (client) => {
   setTimeout(() => {
     ChatLib.say(`/pc CBA >> Carry for ${client} stopped early.`);
   }, 500);
-}).setName("stopcarry");
+}).setName("stopcarry").setAliases("removecarry", "remcar", "remcarry", "delcarry");
 
 let dungeonStarted = false;
 
