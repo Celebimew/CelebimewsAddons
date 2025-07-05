@@ -446,6 +446,10 @@ register("command", (...args) => {
   }
 }).setName("price");
 
+register("command", () => {
+ChatLib.chat("&c&lHypixel Rules: &e&lhttps://support.hypixel.net/hc/en-us/categories/5166495502098-Hypixel-Rules");
+}).setName("hypixelrules");
+
 register("command", (...args) => {
   try {
     const floor = ChatLib.removeFormatting(args[0] || "").toLowerCase().trim();
@@ -665,3 +669,53 @@ register("command", () => {
     ChatLib.chat(`&c&lCBA >> &cWebhook test failed: ${e}`);
   }
 }).setName("cbatestwebhook");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_ability && /Your .* hit .* enemies for .* damage\./.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_ability && /Your .* hit .* enemy for .* damage\./.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_implosion && /Your Implosion hit .* enemies for .* damage\./.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_implosion && /Your Implosion hit .* enemy for .* damage\./.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (event) => {
+  if (config.chat_hide_blocked) cancel(event);
+}).setCriteria("There are blocks in the way!");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_ability_cd && /This ability is on cooldown for .*s/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_arachne_keeper && /Arachne's Keeper used Venom Shot on you hitting you for .* damage and infecting you with venom./.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_arachne_brood && /Arachne's Brood used Venom Shot on you hitting you for .*..* damage and infecting you with venom.\./.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (event) => {
+  if (!config.chat_hide_arachne_calling) return;
+
+  const raw = ChatLib.getChatMessage(event, true);
+  const stripped = ChatLib.removeFormatting(raw);
+
+  if (stripped.includes("placed an Arachne's Calling")) {
+    cancel(event);
+  }
+});
