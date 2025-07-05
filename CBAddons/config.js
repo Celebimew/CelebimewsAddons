@@ -95,49 +95,49 @@ class Settings {
   @SwitchProperty({
     name: "Hide All Ability Messages",
     description: 'Hides all ability messages.',
-    category: "Chat"
+    category: "Messages"
   })
   chat_hide_ability = true;
 
   @SwitchProperty({
     name: "Hide Implosion Messages",
     description: 'Hides implosion messages like "Your Implosion hit 1 enemy for 1,857,709.3 damage."',
-    category: "Chat"
+    category: "Messages"
   })
   chat_hide_implosion = true;
 
   @SwitchProperty({
     name: "Hide Blocks In The Way Messages",
     description: 'Hides "There are blocks in the way!"',
-    category: "Chat"
+    category: "Messages"
   })
   chat_hide_blocked = true;
 
   @SwitchProperty({
     name: "Hide Ability Cooldown Messages",
     description: 'Hides messages like "This ability is on cooldown for 1s."',
-    category: "Chat"
+    category: "Messages"
   })
   chat_hide_ability_cd = true;
 
   @SwitchProperty({
     name: "Hide Arachne's Calling Messages",
     description: `Hides messages like "☄ Celebimew placed an Arachne's Calling! (1/4)"`,
-    category: "Chat"
+    category: "Messages"
   })
   chat_hide_arachne_calling = false;
 
   @SwitchProperty({
     name: "Hide Arachne's Keeper Messages",
     description: `Hides messages like "Arachne's Keeper used Venom Shot on you hitting you for 74.9 damage and infecting you with venom.`,
-    category: "Chat"
+    category: "Messages"
   })
   chat_hide_arachne_keeper = true;
 
   @SwitchProperty({
     name: "Hide Arachne's Brood Messages",
     description: `Hides messages like "Arachne's Brood used Venom Shot on you hitting you for 74.8 damage and infecting you with venom.`,
-    category: "Chat"
+    category: "Messages"
   })
   chat_hide_arachne_brood = true;
   
