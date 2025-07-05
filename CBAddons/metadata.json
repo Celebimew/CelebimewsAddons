@@ -1,8 +1,8 @@
 {
   "name": "&aCelebimew's Addons",
   "author": "Celebimew",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "An addon for tracking dungeon carries!",
   "entry": "index.js",
-  "requires": ["Vigilance"]
+  "requires": ["Vigilance", "FileLib"]
 }
