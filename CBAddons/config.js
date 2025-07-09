@@ -100,13 +100,6 @@ class Settings {
   chat_hide_ability = true;
 
   @SwitchProperty({
-    name: "Hide Implosion Messages",
-    description: 'Hides implosion messages like "Your Implosion hit 1 enemy for 1,857,709.3 damage."',
-    category: "Messages"
-  })
-  chat_hide_implosion = true;
-
-  @SwitchProperty({
     name: "Hide Blocks In The Way Messages",
     description: 'Hides "There are blocks in the way!"',
     category: "Messages"
@@ -114,11 +107,32 @@ class Settings {
   chat_hide_blocked = true;
 
   @SwitchProperty({
+    name: "Hide Kill Combo Messages",
+    description: 'Hides Grandma Wolf kill combo messages.',
+    category: "Messages"
+  })
+  chat_hide_combo = true;
+
+  @SwitchProperty({
     name: "Hide Ability Cooldown Messages",
     description: 'Hides messages like "This ability is on cooldown for 1s."',
     category: "Messages"
   })
   chat_hide_ability_cd = true;
+
+  @SwitchProperty({
+    name: "Hide Loot Share Messages",
+    description: 'Hides loot share messages.',
+    category: "Messages"
+  })
+  chat_hide_loot_share = false;
+
+  @SwitchProperty({
+    name: "Hide Mini-Boss Messages",
+    description: 'Hides Slayer Mini-boss messages.',
+    category: "Messages"
+  })
+  chat_hide_slayer_miniboss = false;
 
   @SwitchProperty({
     name: "Hide Arachne's Calling Messages",
