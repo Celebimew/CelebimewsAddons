@@ -714,3 +714,40 @@ register("chat", (event) => {
     cancel(event);
   }
 });
+
+register("chat", (event) => {
+  if (config.chat_hide_combo) cancel(event);
+}).setCriteria("+5 Kill Combo +3% ✯ Magic Find");
+register("chat", (event) => {
+  if (config.chat_hide_combo) cancel(event);
+}).setCriteria("+10 Kill Combo +10 coins per kill");
+register("chat", (event) => {
+  if (config.chat_hide_combo) cancel(event);
+}).setCriteria("+15 Kill Combo +3% ✯ Magic Find");
+register("chat", (event) => {
+  if (config.chat_hide_combo) cancel(event);
+}).setCriteria("+20 Kill Combo +15☯ Combat Wisdom");
+register("chat", (event) => {
+  if (config.chat_hide_combo) cancel(event);
+}).setCriteria("+25 Kill Combo +3% ✯ Magic Find");
+register("chat", (event) => {
+  if (config.chat_hide_combo) cancel(event);
+}).setCriteria("+30 Kill Combo +10 coins per kill");
+register("chat", (message, event) => {
+  if (config.chat_hide_combo && /Your Kill Combo has expired! You reached a .* Kill Combo!/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_loot_share && /LOOT SHARE You received loot for assisting .*!/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.chat_hide_slayer_miniboss && /SLAYER MINI-BOSS .* .* has spawned!/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+register("chat", (message, event) => {
+  if (config.chat_hide_slayer_miniboss && /SLAYER MINI-BOSS .* has spawned!/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
