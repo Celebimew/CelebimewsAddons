@@ -12,6 +12,7 @@ Chattriggers module for tracking dungeon carries!
 ### General
 `/cba help` - List Celebimew's Addons commands.<br>
 `/cba gui` - Open the config GUI.<br>
+`/cba gui_carry` - Open the carry GUI position editor.<br>
 `/cba version` - Show current Celebimew's Addons version.<br>
 ### Price Checkers
 `/price <floor>` - List Skyblock Maniacs (SBM) Prices for a floor.<br>
