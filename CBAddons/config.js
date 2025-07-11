@@ -3,12 +3,13 @@ import {
   @SwitchProperty,
   @TextProperty,
   @SelectorProperty,
-  @ButtonProperty
+  @ButtonProperty,
+  @SliderProperty
 } from "Vigilance";
 
 @Vigilant("CBAddons", "Celebimew's Addons", {
   getCategoryComparator: () => (a, b) => {
-    const order = ["Config", "Dungeons", "Commands", "Messages", "Discord", "Other"];
+    const order = ["Config", "GUIs", "Dungeons", "Commands", "Messages", "Client Mode", "Discord", "Other"];
     return order.indexOf(a.name) - order.indexOf(b.name);
   }
 })
@@ -77,6 +78,24 @@ class Settings {
     options: ["Dark Mode"]
   })
   gui_mode = 0;
+
+  @SwitchProperty({
+    name: "Carry GUI",
+    description: "Toggle the carry tracker display.",
+    category: "GUIs"
+  })
+  carry_gui_enabled = true;
+
+  @ButtonProperty({
+    name: "Carry GUI Position",
+    description: "Edit the carry GUI's location on the screen.",
+    category: "GUIs",
+    placeholder: "Edit"
+  })
+  commandsGuiCarry() {
+    ChatLib.command("cba gui_carry", true);
+    Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
+  }
 
   @SwitchProperty({
     name: "Enable Dungeon Sacks Shortcut",
