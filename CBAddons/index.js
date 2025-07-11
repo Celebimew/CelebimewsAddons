@@ -84,8 +84,12 @@ register("command", (...args) => {
     return;
   }
 
-}).setName("cba").setAliases("celebimewsaddons", "celebimewaddons", "cbaddons");
+  if (sub === "gui_carry") {
+    carryGuiMove.open()
+    ChatLib.chat("&a&lCBA >> &aIn carry GUI editor. Drag to move, Press ESC to finish.")
+  }
 
+}).setName("cba").setAliases("celebimewsaddons", "celebimewaddons", "cbaddons");
 
 function checkForUpdates() {
   const CURRENT_VERSION = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
@@ -290,7 +294,53 @@ function handleCommand(msg) {
   }
 }
 
-const carries = {};
+const dataPath = "./config/ChatTriggers/modules/CBAddons/guiData/"
+const carries = {}
+
+let carryGuiX = parseInt(FileLib.read(dataPath + "CarryGuiX.txt") || "200")
+let carryGuiY = parseInt(FileLib.read(dataPath + "CarryGuiY.txt") || "100")
+
+export const carryGuiMove = new Gui()
+
+register("dragged", (dx, dy, x, y) => {
+  if (carryGuiMove.isOpen()) {
+    carryGuiX = x
+    carryGuiY = y
+    FileLib.write(dataPath + "CarryGuiX.txt", x)
+    FileLib.write(dataPath + "CarryGuiY.txt", y)
+  }
+})
+
+register("renderOverlay", () => {
+  if (!config.carry_gui_enabled) return
+
+  const editing = carryGuiMove.isOpen()
+  const hasCarries = Object.keys(carries).length > 0
+  if (!editing && !hasCarries) return
+
+  let x = carryGuiX
+  let y = carryGuiY
+
+  if (editing) {
+    Renderer.drawRect(Renderer.color(0, 0, 0, 120), 0, 0, Renderer.screen.getWidth(), Renderer.screen.getHeight())
+  }
+
+
+  Renderer.drawStringWithShadow("§a§lCelebimew's Addons Tracker", x, y)
+  y += 12
+
+  const entries = hasCarries
+    ? Object.entries(carries)
+    : [["Client", { floor: "F7", done: 0, target: 0 }]]
+
+  entries.forEach(([client, data]) => {
+    Renderer.drawStringWithShadow(`§e• Client: §b${client}`, x, y)
+    y += 10
+    Renderer.drawStringWithShadow(`§e• | Floor: §c${data.floor.toUpperCase()} §eCarries: §9${data.done}§e/§1${data.target}`, x, y)
+    y += 15
+  })
+})
+
 const floorRegex = /^(f[1-7]|m[1-7])$/i;
 
 const floorNames = {
