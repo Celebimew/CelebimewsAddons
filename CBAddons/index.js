@@ -1,6 +1,7 @@
 const version = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
 ChatLib.chat(`&9&l[&a&lCBA&9&l] &aYou are running Celebimew's Addons &d&lV.${version}`);
 import config from "./config";
+import { onChatPacket } from "../BloomCore/utils/Events";
 
 function suggestable(text, suggestion, hoverText) {
   const msg = new TextComponent(text);
@@ -801,3 +802,20 @@ register("chat", (message, event) => {
   if (config.chat_hide_slayer_miniboss && /SLAYER MINI-BOSS .* has spawned!/.test(message))
     cancel(event);
 }).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (config.client_mode && /.* Milestone ❸: You have dealt .* Total Damage so far! .*s/.test(message))
+    ChatLib.command("pc CBA Client Mode >> Milestone 3 Reached!")
+}).setCriteria("${message}");
+
+onChatPacket(() => {
+  if (config.dungeon_blood_ready) {
+    ChatLib.command("pc CBA >> Blood Ready to Clear!");
+  }
+}).setCriteria("[BOSS] The Watcher: That will be enough for now.");
+
+onChatPacket(() => {
+  if (config.dungeon_blood_done) {
+    ChatLib.command("pc CBA >> Blood Done!");
+  }
+}).setCriteria("[BOSS] The Watcher: You have proven yourself. You may pass.");
