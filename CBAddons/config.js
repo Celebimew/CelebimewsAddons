@@ -16,7 +16,7 @@ import {
 class Settings {
   @SwitchProperty({
     name: "Client Mode",
-    description: "Enable client mode. Please only enable client mode while receiving carries not giving them. (Coming Soon)",
+    description: "Enable client mode. Please only enable client mode while receiving carries not giving them.",
     category: "Config"
   })
   client_mode = false;
@@ -103,6 +103,20 @@ class Settings {
     category: "Dungeons"
   })
   dungeon_sacks_commands = true;
+
+  @SwitchProperty({
+    name: "Blood Ready",
+    description: "Send a message in party chat informing them that blood is ready.",
+    category: "Dungeons"
+  })
+  dungeon_blood_ready = true;
+
+  @SwitchProperty({
+    name: "Blood Done",
+    description: "Send a message in party chat informing them that blood is done.",
+    category: "Dungeons"
+  })
+  dungeon_blood_done = true;
 
   @SwitchProperty({
     name: "Autokick (Coming Soon)",
