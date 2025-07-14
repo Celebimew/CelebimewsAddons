@@ -36,7 +36,7 @@ Chattriggers module for tracking dungeon carries!
 Coming Soon!
 # Discord Rich Presence
 `/startrpchelper` - Launch the rich presence helper.<br>
-Because of ChatTriggers limitations, Celebimew's Addons will launch an external python script to help with rich presence loading. You can run it by running the command: `/startrpchelper`, Clicking the run button in the GUI or running the .bat file in `/DiscordRPC/StartRPC.bat`. When launched by the command or GUI button, it will not pop up a window and will be a background process (Terminate in task manager. It will show up as Python). You will need to install Python and import **pypresence** and **toml**. You can do this by running `pip install pypresence toml` in a terminal.<br>
+Because of ChatTriggers limitations, Celebimew's Addons will launch an external python script to help with rich presence loading. You can run it by running the command: `/startrpchelper`, Clicking the run button in the GUI or running the .bat file in `/DiscordRPC/StartRPC.bat`. When launched by the command or GUI button, it will not pop up a window and will be a background process (Terminate in task manager. It will show up as Python). You will need to install Python and import **pypresence** and **toml**. You can do this by running `pip install pypresence toml` in a terminal (The .bat file installs pypresence and toml automatically).<br>
 Customize your Rich Presence in config!
 # Bug Reports/Questions
 Please report any bugs in the discord server [Click Here](https://discord.gg/FkJA5Hf7we)
