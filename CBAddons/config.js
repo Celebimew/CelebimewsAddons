@@ -205,7 +205,7 @@ class Settings {
 
   @ButtonProperty({
     name: "Run Rich Presence Helper",
-    description: "Because of ChatTriggers limitations, for Discord Rich Presence to work, CBAddons will have to run an external Python scrypt. Click run to run the Rich Presence Helper.",
+    description: "Because of ChatTriggers limitations, for Discord Rich Presence to work, CBAddons will have to run an external Python script. Click run to run the Rich Presence Helper.",
     category: "Discord",
     placeholder: "Run"
   })
