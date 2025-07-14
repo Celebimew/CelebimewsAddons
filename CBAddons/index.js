@@ -2,6 +2,39 @@ const version = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
 ChatLib.chat(`&9&l[&a&lCBA&9&l] &aYou are running Celebimew's Addons &d&lV.${version}`);
 import config from "./config";
 import { onChatPacket } from "../BloomCore/utils/Events";
+const ProcessBuilder = Java.type("java.lang.ProcessBuilder");
+const { File } = Java.type("java.io");
+
+const moduleDir = new File("config/ChatTriggers/modules/CBAddons");
+const batDir = new File(moduleDir, "DiscordRPC");
+const lockFile = new File(batDir, "running.lock");
+
+register("command", () => {
+    try {
+        if (!batDir.exists()) {
+            ChatLib.chat("&cDirectory not found: /DiscordRPC");
+            return;
+        }
+
+        if (lockFile.exists()) {
+            ChatLib.chat("&c&lCBA >> &cThe Discord Rich Presence Helper is already running!");
+            return;
+        }
+
+        const commandToRun = "StartRPC.bat && echo RPC started && pause";
+
+        const processBuilder = new ProcessBuilder([
+            "cmd", "/k", commandToRun
+        ]);
+
+        processBuilder.directory(batDir);
+        processBuilder.start();
+
+        ChatLib.chat("&a&lCBA >> &aStarted the Discord Rich Presence Helper!");
+    } catch (e) {
+        ChatLib.chat("&cFailed to execute RPC helper: &7" + e);
+    }
+}).setName("startrpchelper");
 
 function suggestable(text, suggestion, hoverText) {
   const msg = new TextComponent(text);
