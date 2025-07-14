@@ -189,19 +189,40 @@ class Settings {
   chat_hide_arachne_brood = true;
   
   @SwitchProperty({
-    name: "Enable Discord Rich Presence (Coming Soon)",
-    description: "Enable or disable Discord Rich Presence.",
-    category: "Discord"
+      name: "Discord Rich Presence",
+      description: "Toggle Discord RPC integration.",
+      category: "Discord"
   })
-  discord_rps = false;
+  discord_rpc = true;
 
   @SelectorProperty({
-    name: "Discord Rich Presence Type",
-    description: "Select which type of Discord Rich Presence to use.",
-    category: "Discord",
-    options: ["Floor_1", "Floor_2", "Floor_3", "Floor_4", "Floor_5", "Floor_6", "Floor_7", "Master_1", "Master_2", "Master_3", "Master_4", "Master_5", "Master_6", "Master_7"]
+      name: "Rich Presence Type",
+      description: "Select the Rich Presence type to display.",
+      category: "Discord",
+      options: ["Placeholder", "Floor_1", "Floor_2", "Floor_3", "Floor_4", "Floor_5", "Floor_6", "Floor_7"]
   })
-  discord_rps_type = 0;
+  rpc_mode = 0;
+
+  @ButtonProperty({
+    name: "Run Rich Presence Helper",
+    description: "Because of ChatTriggers limitations, for Discord Rich Presence to work, CBAddons will have to run an external Python scrypt. Click run to run the Rich Presence Helper.",
+    category: "Discord",
+    placeholder: "Run"
+  })
+  discordPresenceHelper() {
+    ChatLib.command("startrpchelper", true);
+    Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
+  }
+
+  @ButtonProperty({
+    name: "Support Server",
+    description: "Join the Discord server for bug reports, suggestions, etc.",
+    category: "Discord",
+    placeholder: "Join"
+  })
+  openDiscordServer() {
+    Java.type("java.awt.Desktop").getDesktop().browse(new java.net.URI("https://discord.gg/FkJA5Hf7we"));
+  }
 
   @ButtonProperty({
     name: "General Commands",
