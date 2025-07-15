@@ -82,7 +82,7 @@ register("command", (...args) => {
 
   if (sub === "" || sub === "help" || sub === "help_1") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons General Commands: &e&l[1/4]");
+    ChatLib.chat("&a&lCelebimew's Addons General Commands: &e&l[1/5]");
     ChatLib.chat(suggestable("§8• §a/cba gui §e- §fOpen config GUI", "/cba gui", "§aClick to paste /cba gui"));
     ChatLib.chat(suggestable("§8• §a/cba help §e- §fShow this help menu", "/cba help", "§aClick to paste /cba help"));
     ChatLib.chat(suggestable("§8• §a/cba version §e- §fShow current version", "/cba version", "§aClick to paste /cba version"));
@@ -93,7 +93,7 @@ register("command", (...args) => {
 
   if (sub === "help_2") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons Carry Commands: &e&l[2/4]");
+    ChatLib.chat("&a&lCelebimew's Addons Carry Commands: &e&l[2/5]");
     ChatLib.chat(suggestable("§8• §a/startcarry <Floor> <Amount> <Client> §e- §fStart tracking a carry", "/startcarry", "§aClick to paste /startcarry"));
     ChatLib.chat(suggestable("§8• §a/listcarries §e- §fList all active carries", "/listcarries", "§aClick to paste /listcarries"));
     ChatLib.chat(suggestable("§8• §a/stopcarry <Client> §e- §f", "/stopcarry", "§aClick to paste /stopcarry"));
@@ -106,7 +106,7 @@ register("command", (...args) => {
 
   if (sub === "help_3") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons Sacks Commands: &e&l[3/4]");
+    ChatLib.chat("&a&lCelebimew's Addons Sacks Commands: &e&l[3/5]");
     ChatLib.chat(suggestable("§8• §a/boom §e- §fGet 64 Superboom TNT from dungeon sacks", "/boom", "§aClick to paste /boom"));
     ChatLib.chat(suggestable("§8• §a/sl §e- §fGet 16 Spirit Leaps from dungeon sacks", "/sl", "§aClick to paste /sl"));
     ChatLib.chat(suggestable("§8• §a/pearls §e- §fGet 16 Ender Pearls from combat sacks", "/pearls", "§aClick to paste /pearls"));
@@ -120,9 +120,19 @@ register("command", (...args) => {
 
   if (sub === "help_4") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons Party Commands: &e&l[4/4]");
+    ChatLib.chat("&a&lCelebimew's Addons Party Commands: &e&l[4/5]");
     ChatLib.chat(suggestable("§8• §ac!price <Floor> §e- §fList prices for a floor", "c!price ", "§7Click to paste c!price"));
     ChatLib.chat(suggestable("§8• §ac!calcprice <Floor> <Amount> §e- §fCalculate price totals for a floor", "c!calcprice ", "§7Click to paste c!calcprice"));
+    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_5", "&cClick to open Help Page 1!"));
+    ChatLib.chat("&e&m===================================");
+  }
+
+  if (sub === "help_5") {
+    ChatLib.chat("&e&m===================================");
+    ChatLib.chat("&a&lCelebimew's Addons RPC Commands: &e&l[5/5]");
+    ChatLib.chat(suggestable("§8• §a/startrpchelper §e- §fRun the Discord Rich Presence helper", "/startrpchelper", "§7Click to paste /startrpchelper"));
+    ChatLib.chat(suggestable("§8• §a/stoprpchelper §e- §fStop the Rich Presence helper", "/stoprpchelper", "§7Click to paste /stoprpchelper"));
+    ChatLib.chat(suggestable("§8• §a/clearrpchelper §e- §fOnly use this if helper wont start", "/clearrpchelper", "§7Click to paste /clearrpchelper"));
     ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_1", "&cClick to open Help Page 1!"));
     ChatLib.chat("&e&m===================================");
   }
