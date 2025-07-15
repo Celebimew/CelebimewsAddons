@@ -45,6 +45,24 @@ register("command", () => {
     }
 }).setName("clearrpchelper");
 
+register("command", () => {
+    const dir = "config/ChatTriggers/modules/CBAddons/DiscordRPC";
+    const stopFlag = new File(dir, "stop.flag");
+    const lockFile = new File(dir, "running.lock");
+
+    try {
+        const writer = new java.io.PrintWriter(stopFlag);
+        writer.println("stop");
+        writer.close();
+
+        if (lockFile.exists()) lockFile.delete();
+
+        ChatLib.chat("&c&lCBA >> &cSent stop signal to the RPC Helper!");
+    } catch (err) {
+        ChatLib.chat("&c&lCBA >> &cFailed to stop RPC Helper: &7" + err);
+    }
+}).setName("stoprpchelper");
+
 function suggestable(text, suggestion, hoverText) {
   const msg = new TextComponent(text);
   msg.setClick("suggest_command", suggestion);
