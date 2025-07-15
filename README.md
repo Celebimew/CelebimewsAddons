@@ -28,6 +28,10 @@ Chattriggers module for tracking dungeon carries!
 `/draft` - Take 1 Architect's First Draft from your dungeon sacks.<br>
 `/traps` - Take 64 Traps from your dungeon sacks.<br>
 `/decoy` - Take 64 Decoys from your dungeon sacks.<br>
+### Rich Presence Helper Commands
+`/startrpchelper` - Run the Discord Rich Presence helper.<br>
+`/stoprpchelper` - Stop the Discord Rich Presence helper.<br>
+`/clearrpchelper` - Only run this command if the helper refuses to launch.<br>
 ## Party Commands
 ### Price Checkers
 `c!price <floor>` - List Skyblock Maniacs (SBM) Prices for a floor.<br>
