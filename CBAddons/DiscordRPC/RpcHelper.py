@@ -9,6 +9,8 @@ last_mode = None
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_TOML_PATH = os.path.abspath(os.path.join(MODULE_DIR, "../config.toml"))
 METADATA_PATH = os.path.abspath(os.path.join(MODULE_DIR, "../metadata.json"))
+STOP_FLAG_PATH = os.path.join(MODULE_DIR, "stop.flag")
+LOCK_FILE_PATH = os.path.join(MODULE_DIR, "running.lock")
 
 def log(message):
     print(f"[CBAddons] {message}")
@@ -120,22 +122,44 @@ def update_rpc(preset):
     except Exception as e:
         log(f"Error updating RPC: {e}")
 
-log("Celebimew's Addons Discord Rich Presence Helper started.")
+def should_stop():
+    return os.path.exists(STOP_FLAG_PATH)
 
-while True:
-    config = read_config()
-    if not config:
-        stop_rpc()
-    elif not config.get("enabled", False):
-        stop_rpc()
-    else:
-        mode = config.get("mode", "0")
-        preset = RPC.get(mode)
-        if not preset:
+def create_lock():
+    try:
+        with open(LOCK_FILE_PATH, "w") as f:
+            f.write("running")
+    except:
+        pass
+
+def remove_lock_and_flag():
+    if os.path.exists(LOCK_FILE_PATH):
+        os.remove(LOCK_FILE_PATH)
+    if os.path.exists(STOP_FLAG_PATH):
+        os.remove(STOP_FLAG_PATH)
+
+log("Celebimew's Addons Discord Rich Presence Helper started.")
+create_lock()
+
+try:
+    while not should_stop():
+        config = read_config()
+        if not config:
+            stop_rpc()
+        elif not config.get("enabled", False):
             stop_rpc()
         else:
-            if mode != last_mode or preset["clientId"] != active_client_id:
-                start_rpc(preset)
-                last_mode = mode
-            update_rpc(preset)
-    time.sleep(1)
+            mode = config.get("mode", "0")
+            preset = RPC.get(mode)
+            if not preset:
+                stop_rpc()
+            else:
+                if mode != last_mode or preset["clientId"] != active_client_id:
+                    start_rpc(preset)
+                    last_mode = mode
+                update_rpc(preset)
+        time.sleep(1)
+finally:
+    stop_rpc()
+    remove_lock_and_flag()
+    log("RPC Helper stopped.")
