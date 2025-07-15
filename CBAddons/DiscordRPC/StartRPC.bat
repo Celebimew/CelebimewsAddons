@@ -1,10 +1,12 @@
 @echo off
-echo Running > running.lock
+echo Creating lock file...
+echo running > running.lock
 title Celebimew's Addons RPC Helper
 cd /d "%~dp0"
 echo Installing dependencies...
 pip install pypresence toml
 echo Running script...
 python RpcHelper.py
-pause
+echo Deleting lock file...
 del running.lock
+pause
