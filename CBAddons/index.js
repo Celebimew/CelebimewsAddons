@@ -36,6 +36,15 @@ register("command", () => {
     }
 }).setName("startrpchelper");
 
+register("command", () => {
+    if (lockFile.exists()) {
+        lockFile.delete();
+        ChatLib.chat("&e&lCBA >> &eCleared stale RPC lock file.");
+    } else {
+        ChatLib.chat("&a&lCBA >> &aNo lock file found.");
+    }
+}).setName("clearrpchelper");
+
 function suggestable(text, suggestion, hoverText) {
   const msg = new TextComponent(text);
   msg.setClick("suggest_command", suggestion);
