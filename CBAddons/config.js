@@ -268,6 +268,17 @@ class Settings {
     Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
   }
 
+    @ButtonProperty({
+    name: "Rich Presence Commands",
+    description: "Executes: /cba help_5",
+    category: "Commands",
+    placeholder: "Open"
+  })
+  commandsRPC() {
+    ChatLib.command("cba help_4", true);
+    Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
+  }
+
   @ButtonProperty({
     name: "Github Repo",
     description: "Open the Github Repo to check for updates!",
