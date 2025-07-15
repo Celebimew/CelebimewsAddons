@@ -11,9 +11,10 @@ CONFIG_TOML_PATH = os.path.abspath(os.path.join(MODULE_DIR, "../config.toml"))
 METADATA_PATH = os.path.abspath(os.path.join(MODULE_DIR, "../metadata.json"))
 STOP_FLAG_PATH = os.path.join(MODULE_DIR, "stop.flag")
 LOCK_FILE_PATH = os.path.join(MODULE_DIR, "running.lock")
+start_timestamp = int(time.time())
 
 def log(message):
-    print(f"[CBAddons] {message}")
+    print(f"\033[95m[\033[0m\033[92mCBAddons\033[0m\033[95m]\033[0m {message}")
 
 def get_version():
     try:
@@ -79,7 +80,7 @@ def read_config():
             config = toml.loads(raw)
         discord_cfg = config.get("discord", {})
         enabled = discord_cfg.get("discord_rich_presence", False)
-        mode = str(discord_cfg.get("rich_presence_type", "0"))
+        mode = str(discord_cfg.get("rich_presence_type", "0")).strip()
         return {"enabled": enabled, "mode": mode}
     except Exception as e:
         log(f"Failed to read config.toml: {e}")
@@ -98,22 +99,26 @@ def stop_rpc():
     active_client_id = None
 
 def start_rpc(preset):
-    global rpc, active_client_id
+    global rpc, active_client_id, start_timestamp
     stop_rpc()
     try:
-        rpc = Presence(preset["clientId"])
+        rpc = Presence(str(preset["clientId"]))
         rpc.connect()
-        active_client_id = preset["clientId"]
-        log("Started Discord Rich Presence.")
+        active_client_id = str(preset["clientId"])
+        start_timestamp = int(time.time())
+        log(f"Started Discord Rich Presence with client ID {active_client_id}.")
     except Exception as e:
         log(f"Error starting RPC: {e}")
         rpc = None
+        active_client_id = None
 
 def update_rpc(preset):
     if not rpc:
         return
     try:
-        kwargs = {}
+        kwargs = {
+            "start": start_timestamp
+        }
         if preset.get("details"):
             kwargs["details"] = preset["details"]
         if preset.get("state"):
@@ -144,17 +149,26 @@ create_lock()
 try:
     while not should_stop():
         config = read_config()
-        if not config:
+        if not config or not config.get("enabled", False):
+            if rpc:
+                log("Config disabled or unreadable. Stopping RPC.")
             stop_rpc()
-        elif not config.get("enabled", False):
-            stop_rpc()
+            last_mode = None
+            active_client_id = None
         else:
-            mode = config.get("mode", "0")
+            mode = str(config.get("mode", "0")).strip()
             preset = RPC.get(mode)
+
             if not preset:
+                log(f"Invalid mode '{mode}' in config.")
                 stop_rpc()
+                last_mode = None
+                active_client_id = None
             else:
-                if mode != last_mode or preset["clientId"] != active_client_id:
+                preset_id = str(preset["clientId"])
+
+                if rpc is None or mode != last_mode or preset_id != active_client_id:
+                    log(f"Restarting RPC. Reason - rpc is None: {rpc is None}, mode changed: {mode != last_mode}, clientId changed: {preset_id != active_client_id}")
                     start_rpc(preset)
                     last_mode = mode
                 update_rpc(preset)
