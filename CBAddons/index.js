@@ -97,8 +97,10 @@ register("command", (...args) => {
     ChatLib.chat(suggestable("§8• §a/startcarry <Floor> <Amount> <Client> §e- §fStart tracking a carry", "/startcarry", "§aClick to paste /startcarry"));
     ChatLib.chat(suggestable("§8• §a/listcarries §e- §fList all active carries", "/listcarries", "§aClick to paste /listcarries"));
     ChatLib.chat(suggestable("§8• §a/stopcarry <Client> §e- §f", "/stopcarry", "§aClick to paste /stopcarry"));
-    ChatLib.chat(suggestable("§8• §a/price <Floor> §e- §fList prices for a floor", "/price ", "§7Click to paste /price"));
-    ChatLib.chat(suggestable("§8• §a/calcprice <Floor> <Amount> §e- §fCalculate total prices for a floor", "/calcprice ", "§7Click to paste /calcprice"));
+    ChatLib.chat(suggestable("§8• §a/price <Floor> §e- §fList SBM prices for a floor", "/price ", "§7Click to paste /price"));
+    ChatLib.chat(suggestable("§8• §a/dhprice <Floor> §e- §fList DH prices for a floor", "/dhprice ", "§7Click to paste /dhprice"));
+    ChatLib.chat(suggestable("§8• §a/calcprice <Floor> <Amount> §e- §fCalculate total SBM prices for a floor", "/calcprice ", "§7Click to paste /calcprice"));
+    ChatLib.chat(suggestable("§8• §a/calcdhprice <Floor> <Amount> §e- §fCalculate total DH prices for a floor", "/calcdhprice ", "§7Click to paste /calcdhprice"));
     ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_3", "&cClick to open Help Page 3!"))
     ChatLib.chat("&e&m===================================");
     return;
@@ -121,8 +123,10 @@ register("command", (...args) => {
   if (sub === "help_4") {
     ChatLib.chat("&e&m===================================");
     ChatLib.chat("&a&lCelebimew's Addons Party Commands: &e&l[4/5]");
-    ChatLib.chat(suggestable("§8• §ac!price <Floor> §e- §fList prices for a floor", "c!price ", "§7Click to paste c!price"));
-    ChatLib.chat(suggestable("§8• §ac!calcprice <Floor> <Amount> §e- §fCalculate price totals for a floor", "c!calcprice ", "§7Click to paste c!calcprice"));
+    ChatLib.chat(suggestable("§8• §ac!price <Floor> §e- §fList SBM prices for a floor", "c!price ", "§7Click to paste c!price"));
+    ChatLib.chat(suggestable("§8• §ac!dhprice <Floor> §e- §fList DH prices for a floor", "c!dhprice ", "§7Click to paste c!dhprice"));
+    ChatLib.chat(suggestable("§8• §ac!calcprice <Floor> <Amount> §e- §fCalculate SBM price totals for a floor", "c!calcprice ", "§7Click to paste c!calcprice"));
+    ChatLib.chat(suggestable("§8• §ac!calcdhprice <Floor> <Amount> §e- §fCalculate DH price totals for a floor", "c!calcdhprice ", "§7Click to paste c!calcdhprice"));
     ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_5", "&cClick to open Help Page 1!"));
     ChatLib.chat("&e&m===================================");
   }
@@ -221,6 +225,19 @@ const priceMap = {
   m6: "S: 8m/6.75m",
   m7: "S: 35m/30m"
 };
+const dhpriceMap = {
+  f4: "Comp: 500k || S: 700k",
+  f5: "Comp: 400k || S: 600k || S+: 750k",
+  f6: "Comp: 650k || S: 1m || S+: 1.4m",
+  f7: "Comp: 5m || S: 8m || S+: 11m",
+  m1: "S: 1m",
+  m2: "S: 1.75m",
+  m3: "S: 2.5m",
+  m4: "S: 12m",
+  m5: "S: 5m",
+  m6: "S: 7m",
+  m7: "S: 30m"
+};
 
 const commands = {
   price: (args) => {
@@ -272,25 +289,25 @@ calcprice: (args) => {
       case "f4":
         comp = format((over5 ? 500000 : 600000) * amount);
         s = format((over5 ? 700000 : 850000) * amount);
-        result = `${comp} || ${s} || No data`;
+        result = `Comp: ${comp} || S: ${s} || No data`;
         break;
       case "f5":
         comp = format((over5 ? 500000 : 600000) * amount);
         s = format((over5 ? 650000 : 750000) * amount);
         sp = format((over5 ? 1000000 : 1200000) * amount);
-        result = `${comp} || ${s} || ${sp}`;
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
         break;
       case "f6":
         comp = format((over5 ? 600000 : 700000) * amount);
         s = format((over5 ? 850000 : 1000000) * amount);
         sp = format((over5 ? 1200000 : 1400000) * amount);
-        result = `${comp} || ${s} || ${sp}`;
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
         break;
       case "f7":
         comp = format((over5 ? 4000000 : 5000000) * amount);
         s = format((over5 ? 8250000 : 9500000) * amount);
         sp = format((over5 ? 10500000 : 12000000) * amount);
-        result = `${comp} || ${s} || ${sp}`;
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
         break;
       case "m1":
         s = format((over5 ? 1000000 : 1250000) * amount);
@@ -334,7 +351,119 @@ calcprice: (args) => {
     ChatLib.chat(`§cCBA >> [Error: calcprice] ${err}`);
     console.error(err);
   }
-}
+},
+calcdhprice: (args) => {
+  try {
+    const floor = ChatLib.removeFormatting(args[0] || "").toLowerCase().trim();
+    const amountRaw = args[1];
+    const amount = parseInt(amountRaw);
+
+    if (!floor || isNaN(amount)) {
+      ChatLib.chat(`§cCBA >> Invalid floor or amount. floor: ${floor}, amountRaw: ${amountRaw}`);
+      return setTimeout(() => {
+        ChatLib.say("/pc CBA >> Usage: c!calcdhprice <floor> <amount>");
+      }, 500);
+    }
+
+    const over5 = amount >= 5;
+
+    const format = (n) => {
+      if (typeof n !== "number" || isNaN(n)) {
+        throw new Error(`Tried to format invalid number: ${n}`);
+      }
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    let comp = 0, s = 0, sp = 0, result = "";
+
+    switch (floor) {
+      case "f4":
+        comp = format(500000 * amount);
+        s = format(700000 * amount);
+        result = `Comp: ${comp} || S: ${s} || No data`;
+        break;
+      case "f5":
+        comp = format(400000 * amount);
+        s = format(600000 * amount);
+        sp = format(750000 * amount);
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
+        break;
+      case "f6":
+        comp = format(650000 * amount);
+        s = format(1000000 * amount);
+        sp = format(1400000 * amount);
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
+        break;
+      case "f7":
+        comp = format(5000000 * amount);
+        s = format(8000000 * amount);
+        sp = format(11000000 * amount);
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
+        break;
+      case "m1":
+        s = format((over5 ? 1000000 : 1250000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m2":
+        s = format((over5 ? 2200000 : 2500000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m3":
+        s = format((over5 ? 3600000 : 4000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m4":
+        s = format(15000000 * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m5":
+        s = format((over5 ? 5250000 : 5750000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m6":
+        s = format((over5 ? 6750000 : 8000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m7":
+        s = format((over5 ? 30000000 : 35000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      default:
+        return setTimeout(() => {
+          ChatLib.say(`/pc CBA >> Unknown floor: ${floor}`);
+        }, 500);
+    }
+
+    setTimeout(() => {
+      ChatLib.say(`/pc CBA >> Dungeon Hub (DH) Price for ${amount} ${floor.toUpperCase()} runs: ${result}`);
+    }, 500);
+
+  } catch (err) {
+    ChatLib.chat(`§cCBA >> [Error: calcprice] ${err}`);
+    console.error(err);
+  }
+},
+  dhprice: (args) => {
+    const floor = args[0]?.toLowerCase();
+    if (!floor) {
+      setTimeout(() => {
+        ChatLib.say("/pc CBA >> Usage: c!price <floor>");
+      }, 500);
+      return;
+    }
+
+    const result = dhpriceMap[floor];
+
+    if (result) {
+      setTimeout(() => {
+        ChatLib.say(`/pc CBA >> Dungeon Hub (DH) price for ${floor.toUpperCase()}: ${result}`);
+      }, 500);
+    } else {
+      setTimeout(() => {
+        ChatLib.say(`/pc CBA >> Unknown floor: ${floor}`);
+      }, 500);
+    }
+  },
 };
 
 const myUsername = Player.getName();
@@ -448,6 +577,7 @@ register("command", (floor, amount, client) => {
 
   setTimeout(() => {
     ChatLib.say(`/pc CBA >> Started carry for ${client} (${floor.toUpperCase()} x${amount})`);
+    ChatLib.chat(`&a&lCBA &7>> &aStarted carry for &b&l${client} &e(&c&l${floor.toUpperCase()} &9&lx${amount}&e)`);
   }, 500);
 }).setName("startcarry");
 
@@ -467,6 +597,7 @@ register("command", (client) => {
   delete carries[client];
   setTimeout(() => {
     ChatLib.say(`/pc CBA >> Carry for ${client} stopped early.`);
+    ChatLib.chat(`&a&lCBA &7>> &cStopped carry for &b&l${client}.`);
   }, 500);
 }).setName("stopcarry").setAliases("removecarry", "remcar", "remcarry", "delcarry");
 
@@ -480,6 +611,18 @@ register("chat", () => {
     ChatLib.say("/pc CBA >> Reminder: Milestone 2 for chests! Milestone 3 for max EXP!");
   }, 1000);
 }).setCriteria("Starting in 1 second.");
+
+register("chat", () => {
+  if (config.dungeon_auto_warp) {
+    ChatLib.command("p warp", false);
+  }
+}).setCriteria("Starting in 4 seconds.");
+
+register("chat", () => {
+  if (config.dungeon_auto_pot) {
+    ChatLib.command("pb", false);
+  }
+}).setCriteria("Starting in 3 seconds.");
 
 register("worldLoad", () => {
   dungeonStarted = false;
@@ -521,32 +664,6 @@ register("command", () => {
   }
 }).setCommandName("trap").setAliases("traps", "dungeontraps", "dungeontrap");
 
-register("command", (subcommand, floorArg) => {
-  if (!subcommand || subcommand.toLowerCase() !== "carrytracker") {
-    ChatLib.chat("&c&lCBA >> &cUsage: /cbadebug carrytracker <f1-f7/m1-m7>");
-    return;
-  }
-
-  const floor = floorArg?.toLowerCase();
-  const validFloors = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "m1", "m2", "m3", "m4", "m5", "m6", "m7"];
-
-  if (!validFloors.includes(floor)) {
-    ChatLib.chat("&c&lCBA >> &cInvalid floor: " + floor);
-    return;
-  }
-
-  const testClient = "DebugClient";
-
-  carries[testClient] = {
-    floor: floor,
-    done: 0,
-    target: 1
-  };
-
-  ChatLib.chat(`&a&lCBA >> &aSimulating carry for &d${floor.toUpperCase()} &awith test client.`);
-  updateCarryProgress(floor);
-}).setName("cbadebug");
-
 register("command", (...args) => {
   const floor = args[0]?.toLowerCase();
   if (!floor) {
@@ -561,6 +678,21 @@ register("command", (...args) => {
     ChatLib.chat(`§9§l[§a§lCBA§9§l] §cUnknown floor: ${floor}`);
   }
 }).setName("price");
+
+register("command", (...args) => {
+  const floor = args[0]?.toLowerCase();
+  if (!floor) {
+    ChatLib.chat("§9§l[§a§lCBA§9§l] §cUsage: /dhprice <floor>");
+    return;
+  }
+
+  const result = dhpriceMap[floor];
+  if (result) {
+    ChatLib.chat(`§9§l[§a§lCBA§9§l] §aDH price for §d${floor.toUpperCase()}§a: §e${result}`);
+  } else {
+    ChatLib.chat(`§9§l[§a§lCBA§9§l] §cUnknown floor: ${floor}`);
+  }
+}).setName("dhprice");
 
 register("command", () => {
 ChatLib.chat("&c&lHypixel Rules: &e&lhttps://support.hypixel.net/hc/en-us/categories/5166495502098-Hypixel-Rules");
@@ -640,12 +772,94 @@ register("command", (...args) => {
         return;
     }
 
-    ChatLib.chat(`§9§l[§a§lCBA§9§l] §aSBM Price for §d${amount} ${floor.toUpperCase()}§a runs: §e${result}`);
+    ChatLib.chat(`§9§l[§a§lCBA§9§l] §aSkyblock Maniacs (SBM) Price for §d${amount} ${floor.toUpperCase()}§a runs: §e${result}`);
   } catch (err) {
     ChatLib.chat(`§cCBA >> [Error: calcprice] ${err}`);
     console.error(err);
   }
 }).setName("calcprice");
+
+register("command", (...args) => {
+  try {
+    const floor = ChatLib.removeFormatting(args[0] || "").toLowerCase().trim();
+    const amountRaw = args[1];
+    const amount = parseInt(amountRaw);
+
+    if (!floor || isNaN(amount)) {
+      ChatLib.chat(`§cCBA >> Invalid floor or amount. floor: ${floor}, amountRaw: ${amountRaw}`);
+      ChatLib.chat("§9§l[§a§lCBA§9§l] §cUsage: /calcdhprice <floor> <amount>");
+      return;
+    }
+
+    const over5 = amount >= 5;
+    const format = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    let comp = 0, s = 0, sp = 0, result = "";
+
+    switch (floor) {
+      case "f4":
+        comp = format(500000 * amount);
+        s = format(700000 * amount);
+        result = `Comp: ${comp} || S: ${s} || No data`;
+        break;
+      case "f5":
+        comp = format(400000 * amount);
+        s = format(600000 * amount);
+        sp = format(750000 * amount);
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
+        break;
+      case "f6":
+        comp = format(650000 * amount);
+        s = format(1000000 * amount);
+        sp = format(1400000 * amount);
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
+        break;
+      case "f7":
+        comp = format(5000000 * amount);
+        s = format(8000000 * amount);
+        sp = format(11000000 * amount);
+        result = `Comp: ${comp} || S: ${s} || S+: ${sp}`;
+        break;
+      case "m1":
+        s = format((over5 ? 1000000 : 1250000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m2":
+        s = format((over5 ? 2200000 : 2500000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m3":
+        s = format((over5 ? 3600000 : 4000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m4":
+        s = format(15000000 * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m5":
+        s = format((over5 ? 5250000 : 5750000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m6":
+        s = format((over5 ? 6750000 : 8000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      case "m7":
+        s = format((over5 ? 30000000 : 35000000) * amount);
+        result = `- || ${s} || -`;
+        break;
+      default:
+        return setTimeout(() => {
+          ChatLib.say(`/pc CBA >> Unknown floor: ${floor}`);
+        }, 500);
+    }
+
+    ChatLib.chat(`§9§l[§a§lCBA§9§l] §aDungeon Hub (DH) Price for §d${amount} ${floor.toUpperCase()}§a runs: §e${result}`);
+  } catch (err) {
+    ChatLib.chat(`§cCBA >> [Error: calcprice] ${err}`);
+    console.error(err);
+  }
+}).setName("calcdhprice");
 
 register("chat", (time) => updateCarryProgress("f1")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cBonzo &r&ein &r&a${time}&r");
 register("chat", (time) => updateCarryProgress("f2")).setChatCriteria("${*}&r&c☠ &r&eDefeated &r&cScarf &r&ein &r&a${time}&r");
