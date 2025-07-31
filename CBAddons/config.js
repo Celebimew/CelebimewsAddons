@@ -64,14 +64,6 @@ class Settings {
   auto_requeue = false;
 
   @SelectorProperty({
-    name: "Price Info Source",
-    description: "Which source to use for c!price.",
-    category: "Config",
-    options: ["Skyblock Maniacs"]
-  })
-  price_info = 0;
-
-  @SelectorProperty({
     name: "GUI Theme",
     description: "The theme of the CBA Config GUI.",
     category: "Config",
@@ -98,7 +90,21 @@ class Settings {
   }
 
   @SwitchProperty({
-    name: "Enable Dungeon Sacks Shortcut",
+    name: "Auto Warp",
+    description: "Automatically warp the party at the start of every run.",
+    category: "Dungeons"
+  })
+  dungeon_auto_warp = false;
+
+  @SwitchProperty({
+    name: "Auto Pot",
+    description: "Automatically open your Potion Bag at the start of every run.",
+    category: "Dungeons"
+  })
+  dungeon_auto_pot = false;
+
+  @SwitchProperty({
+    name: "Dungeon Sacks Shortcut",
     description: "Enable dungeon sacks shortcut commands like /boom or /sl.",
     category: "Dungeons"
   })
