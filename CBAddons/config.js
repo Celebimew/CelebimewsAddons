@@ -9,7 +9,7 @@ import {
 
 @Vigilant("CBAddons", "Celebimew's Addons", {
   getCategoryComparator: () => (a, b) => {
-    const order = ["Config", "GUIs", "Dungeons", "Commands", "Messages", "Client Mode", "Discord", "Other"];
+    const order = ["Config", "GUIs", "Dungeons", "Commands", "Party Commands", "Messages", "Utilities", "Client Mode", "Discord", "Other"];
     return order.indexOf(a.name) - order.indexOf(b.name);
   }
 })
@@ -34,13 +34,6 @@ class Settings {
     category: "Config"
   })
   discord_webhook_url = "";
-
-  @SwitchProperty({
-    name: "Enable Party Commands",
-    description: "Allow party message commands like c!price.",
-    category: "Config"
-  })
-  party_commands = true;
 
   @SwitchProperty({
     name: "Enable Guild Commands",
@@ -195,6 +188,34 @@ class Settings {
   chat_hide_arachne_brood = true;
   
   @SwitchProperty({
+    name: "Auto Tip",
+    description: `Automatically tips all players when swapping servers.`,
+    category: "Utilities"
+  })
+  util_autotip = false;
+
+  @SwitchProperty({
+    name: "Auto Party",
+    description: "Toggle auto-accepting party invites.",
+    category: "Utilities"
+  })
+  util_autoparty = true;
+
+  @SwitchProperty({
+    name: "Auto Party All",
+    description: "If enabled, accept party invites from anyone (Auto Party must be on).",
+    category: "Utilities"
+  })
+  util_autoparty_all = false;
+
+  @TextProperty({
+    name: "Auto Party Whitelist",
+    description: "Comma-separated list of usernames to auto-party (only used if Auto Party All is off).",
+    category: "Utilities"
+  })
+  util_autoparty_list = "Celebimew, Caelvoria";
+
+  @SwitchProperty({
       name: "Discord Rich Presence",
       description: "Toggle Discord RPC integration.",
       category: "Discord"
@@ -285,6 +306,22 @@ class Settings {
     Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
   }
 
+  @SwitchProperty({
+    name: "Party Commands",
+    description: "Allow party message commands like c!price.",
+    category: "Party Commands"
+  })
+  party_commands = true;
+
+  @SliderProperty({
+    name: "Warp Countdown Delay",
+    description: "Time (in seconds) to wait before executing /p warp when someone runs c!warp",
+    category: "Party Commands",
+    min: 1,
+    max: 30
+  })
+  party_warp_delay = 5;
+
   @ButtonProperty({
     name: "Github Repo",
     description: "Open the Github Repo to check for updates!",
@@ -351,6 +388,13 @@ class Settings {
 
   constructor() {
     this.initialize(this);
+  }
+
+  getWhitelist() {
+    return this.util_autoparty_list
+      .split(",")
+      .map(name => name.trim().toLowerCase())
+      .filter(name => name.length > 0);
   }
 }
 
