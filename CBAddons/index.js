@@ -79,6 +79,7 @@ function clickable(text, command, hoverText) {
 
 register("command", (...args) => {
   const sub = (args[0] || "").toLowerCase();
+  const nameArg = args[1];
 
   if (sub === "" || sub === "help" || sub === "help_1") {
     ChatLib.chat("&e&m===================================");
@@ -127,6 +128,8 @@ register("command", (...args) => {
     ChatLib.chat(suggestable("§8• §ac!dhprice <Floor> §e- §fList DH prices for a floor", "c!dhprice ", "§7Click to paste c!dhprice"));
     ChatLib.chat(suggestable("§8• §ac!calcprice <Floor> <Amount> §e- §fCalculate SBM price totals for a floor", "c!calcprice ", "§7Click to paste c!calcprice"));
     ChatLib.chat(suggestable("§8• §ac!calcdhprice <Floor> <Amount> §e- §fCalculate DH price totals for a floor", "c!calcdhprice ", "§7Click to paste c!calcdhprice"));
+    ChatLib.chat(suggestable("§8• §ac!warp §e- §fWarp the party after a countdown (Editable in Config)", "c!warp", "§7Click to paste c!warp"));
+    ChatLib.chat(suggestable("§8• §ac!stop §e- §fStop a party warp (Only when countdown is still active)", "c!stop", "§7Click to paste c!stop"));
     ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_5", "&cClick to open Help Page 1!"));
     ChatLib.chat("&e&m===================================");
   }
@@ -201,6 +204,7 @@ function checkForUpdates() {
     });
 }
 
+
 register("gameLoad", () => {
   checkForUpdates();
 });
@@ -238,6 +242,29 @@ const dhpriceMap = {
   m6: "S: 7m",
   m7: "S: 30m"
 };
+
+let warpCountdown = null;
+let countdownTime = 0;
+let warpCancelled = false;
+
+function runWarpCountdown() {
+  if (warpCancelled) {
+    ChatLib.say("/pc CBA >> Warp canceled.");
+    warpCountdown = null;
+    warpCancelled = false;
+    return;
+  }
+
+  if (countdownTime > 0) {
+    ChatLib.say(`/pc CBA >> Warping in ${countdownTime} second${countdownTime > 1 ? "s" : ""}... Type c!stop in party chat to stop!`);
+    countdownTime--;
+    warpCountdown = setTimeout(runWarpCountdown, 1000);
+  } else {
+    warpCountdown = null;
+    ChatLib.say("/pc CBA >> Warping now!");
+    ChatLib.command("p warp");
+  }
+}
 
 const commands = {
   price: (args) => {
@@ -464,6 +491,29 @@ calcdhprice: (args) => {
       }, 500);
     }
   },
+  warp: () => {
+    if (warpCountdown !== null) {
+      ChatLib.say("/pc CBA >> Delayed Warp is already in progress.");
+      return;
+    }
+
+    countdownTime = config.party_warp_delay;
+    warpCancelled = false;
+    runWarpCountdown();
+  },
+
+  stop: () => {
+
+    if (warpCountdown === null) {
+      return;
+    }
+
+    warpCancelled = true;
+  },
+
+  help: () => {
+    ChatLib.command("CBA >> Party commands: c!price <floor>, c!calcprice <floor> <amount>, c!dhprice <floor>, c!calcdhprice <floor> <amount>, c!warp, c!stop")
+  }
 };
 
 const myUsername = Player.getName();
@@ -956,49 +1006,56 @@ function updateCarryProgress(floor) {
     }
   });
 }
-register("command", () => {
-  ChatLib.chat("&6&lCBA >> &6Webhook test command triggered.");
 
-  if (!config.discord_integration) {
-    ChatLib.chat("&c&lCBA >> &cDiscord integration is disabled in config.");
-    return;
-  }
+register("chat", (msg, event) => {
+  if (!config.util_autoparty && config.util_autoparty_all) return;
 
-  const webhookURL = config.discord_webhook_url?.trim();
-  if (!webhookURL || !/^https:\/\/discord\.com\/api\/webhooks\//.test(webhookURL)) {
-    ChatLib.chat("&c&lCBA >> &cInvalid webhook URL! Please edit this in the config menu (/cba)");
-    return;
-  }
+  const cleaned = ChatLib.removeFormatting(msg);
 
-  try {
-    const payload = JSON.stringify({
-      embeds: [{
-        title: "Test Webhook",
-        description: "This is a test message from CBAddons.",
-        footer: { text: "Celebimew's Addons Carry Tracker" },
-        color: 0x00FF00
-      }]
-    });
+  if (
+    cleaned.includes("has invited you to join their party!") &&
+    cleaned.includes("Click here to join!")
+  ) {
+    const match = cleaned.match(/\] (.+) has invited you to join their party!/);
+    const username = match ? match[1] : null;
 
-    const connection = new java.net.URL(webhookURL).openConnection();
-    connection.setDoOutput(true);
-    connection.setRequestMethod("POST");
-    connection.setRequestProperty("Content-Type", "application/json");
-
-    const outputStream = connection.getOutputStream();
-    outputStream.write(new java.lang.String(payload).getBytes("UTF-8"));
-    outputStream.close();
-
-    const responseCode = connection.getResponseCode();
-    if (responseCode === 204) {
-      ChatLib.chat("&a&lCBA >> &aWebhook test sent successfully.");
-    } else {
-      ChatLib.chat(`&c&lCBA >> &cWebhook test error (code ${responseCode})`);
+    if (!username) {
+      ChatLib.chat("&c[CBA] Failed to extract username.");
+      return;
     }
-  } catch (e) {
-    ChatLib.chat(`&c&lCBA >> &cWebhook test failed: ${e}`);
+
+    const lowerUsername = username.toLowerCase();
+    const whitelist = config.getWhitelist();
+
+    if (!whitelist.includes(lowerUsername)) {
+      ChatLib.chat(`&c[CBA] Ignored party invite from &7${username} &cbecause they're not in your whitelist.`);
+      return;
+    }
+
+    ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
+    ChatLib.command(`p accept ${username}`);
   }
-}).setName("cbatestwebhook");
+}).setCriteria("${message}");
+
+register("chat", (msg, event) => {
+  if (!config.util_autoparty_all || !config.util_autoparty) return;
+  const cleaned = ChatLib.removeFormatting(msg);
+
+  if (
+    cleaned.includes("has invited you to join their party!") &&
+    cleaned.includes("Click here to join!")
+  ) {
+    const match = cleaned.match(/\] (.+) has invited you to join their party!/);
+    const username = match ? match[1] : null;
+
+    if (username) {
+      ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
+      ChatLib.command(`p accept ${username}`);
+    } else {
+      ChatLib.chat("&c[CBA] Failed to extract username.");
+    }
+  }
+}).setCriteria("${message}");
 
 register("chat", (message, event) => {
   if (config.chat_hide_ability && /Your .* hit .* enemies for .* damage\./.test(message))
@@ -1050,24 +1107,30 @@ register("chat", (event) => {
   }
 });
 
-register("chat", (event) => {
-  if (config.chat_hide_combo) cancel(event);
-}).setCriteria("+5 Kill Combo +3% ✯ Magic Find");
-register("chat", (event) => {
-  if (config.chat_hide_combo) cancel(event);
-}).setCriteria("+10 Kill Combo +10 coins per kill");
-register("chat", (event) => {
-  if (config.chat_hide_combo) cancel(event);
-}).setCriteria("+15 Kill Combo +3% ✯ Magic Find");
-register("chat", (event) => {
-  if (config.chat_hide_combo) cancel(event);
-}).setCriteria("+20 Kill Combo +15☯ Combat Wisdom");
-register("chat", (event) => {
-  if (config.chat_hide_combo) cancel(event);
-}).setCriteria("+25 Kill Combo +3% ✯ Magic Find");
-register("chat", (event) => {
-  if (config.chat_hide_combo) cancel(event);
-}).setCriteria("+30 Kill Combo +10 coins per kill");
+register("chat", (message, event) => {
+  if (config.chat_hide_combo && /\+5 Kill Combo \+.*% ✯ Magic Find/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+register("chat", (message, event) => {
+  if (config.chat_hide_combo && /\+10 Kill Combo \+.* coins per kill/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+register("chat", (message, event) => {
+  if (config.chat_hide_combo && /\+15 Kill Combo \+.*% ✯ Magic Find/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+register("chat", (message, event) => {
+  if (config.chat_hide_combo && /\+20 Kill Combo \+.*☯ Combat Wisdom/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+register("chat", (message, event) => {
+  if (config.chat_hide_combo && /\+25 Kill Combo \+.*% ✯ Magic Find/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
+register("chat", (message, event) => {
+  if (config.chat_hide_combo && /\+30 Kill Combo \+.* coins per kill/.test(message))
+    cancel(event);
+}).setCriteria("${message}");
 register("chat", (message, event) => {
   if (config.chat_hide_combo && /Your Kill Combo has expired! You reached a .* Kill Combo!/.test(message))
     cancel(event);
@@ -1087,7 +1150,7 @@ register("chat", (message, event) => {
     cancel(event);
 }).setCriteria("${message}");
 
-register("chat", (message, event) => {
+register("chat", (message) => {
   if (config.client_mode && /.* Milestone ❸: You have dealt .* Total Damage so far! .*s/.test(message))
     ChatLib.command("pc CBA Client Mode >> Milestone 3 Reached!")
 }).setCriteria("${message}");
@@ -1103,3 +1166,13 @@ onChatPacket(() => {
     ChatLib.command("pc CBA >> Blood Done!");
   }
 }).setCriteria("[BOSS] The Watcher: You have proven yourself. You may pass.");
+
+register("chat", (message) => {
+  if (config.util_autotip && /Sending to server .*.../.test(message))
+    ChatLib.command("tip all")
+}).setCriteria("${message}");
+
+register("chat", (message) => {
+  if (config.util_autotip && /Sending you to .*!/.test(message))
+    ChatLib.command("tip all")
+}).setCriteria("${message}");
