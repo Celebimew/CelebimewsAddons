@@ -1,6 +1,7 @@
 const version = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
 ChatLib.chat(`&9&l[&a&lCBA&9&l] &aYou are running Celebimew's Addons &d&lV.${version}`);
 import config from "./config";
+import request from "../requestV2";
 import { onChatPacket } from "../BloomCore/utils/Events";
 const ProcessBuilder = Java.type("java.lang.ProcessBuilder");
 const { File } = Java.type("java.io");
@@ -83,7 +84,7 @@ register("command", (...args) => {
 
   if (sub === "" || sub === "help" || sub === "help_1") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons General Commands: &e&l[1/5]");
+    ChatLib.chat("&a&lCelebimew's Addons General Commands: &e&l[1/6]");
     ChatLib.chat(suggestable("§8• §a/cba gui §e- §fOpen config GUI", "/cba gui", "§aClick to paste /cba gui"));
     ChatLib.chat(suggestable("§8• §a/cba help §e- §fShow this help menu", "/cba help", "§aClick to paste /cba help"));
     ChatLib.chat(suggestable("§8• §a/cba version §e- §fShow current version", "/cba version", "§aClick to paste /cba version"));
@@ -94,7 +95,7 @@ register("command", (...args) => {
 
   if (sub === "help_2") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons Carry Commands: &e&l[2/5]");
+    ChatLib.chat("&a&lCelebimew's Addons Carry Commands: &e&l[2/6]");
     ChatLib.chat(suggestable("§8• §a/startcarry <Floor> <Amount> <Client> §e- §fStart tracking a carry", "/startcarry", "§aClick to paste /startcarry"));
     ChatLib.chat(suggestable("§8• §a/listcarries §e- §fList all active carries", "/listcarries", "§aClick to paste /listcarries"));
     ChatLib.chat(suggestable("§8• §a/stopcarry <Client> §e- §f", "/stopcarry", "§aClick to paste /stopcarry"));
@@ -109,7 +110,7 @@ register("command", (...args) => {
 
   if (sub === "help_3") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons Sacks Commands: &e&l[3/5]");
+    ChatLib.chat("&a&lCelebimew's Addons Sacks Commands: &e&l[3/6]");
     ChatLib.chat(suggestable("§8• §a/boom §e- §fGet 64 Superboom TNT from dungeon sacks", "/boom", "§aClick to paste /boom"));
     ChatLib.chat(suggestable("§8• §a/sl §e- §fGet 16 Spirit Leaps from dungeon sacks", "/sl", "§aClick to paste /sl"));
     ChatLib.chat(suggestable("§8• §a/pearls §e- §fGet 16 Ender Pearls from combat sacks", "/pearls", "§aClick to paste /pearls"));
@@ -123,23 +124,32 @@ register("command", (...args) => {
 
   if (sub === "help_4") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons Party Commands: &e&l[4/5]");
+    ChatLib.chat("&a&lCelebimew's Addons Party Commands: &e&l[4/6]");
+    ChatLib.chat(suggestable("§8• §ac!help §e- §fShow party commands", "c!help", "§7Click to paste c!help"));
     ChatLib.chat(suggestable("§8• §ac!price <Floor> §e- §fList SBM prices for a floor", "c!price ", "§7Click to paste c!price"));
     ChatLib.chat(suggestable("§8• §ac!dhprice <Floor> §e- §fList DH prices for a floor", "c!dhprice ", "§7Click to paste c!dhprice"));
     ChatLib.chat(suggestable("§8• §ac!calcprice <Floor> <Amount> §e- §fCalculate SBM price totals for a floor", "c!calcprice ", "§7Click to paste c!calcprice"));
     ChatLib.chat(suggestable("§8• §ac!calcdhprice <Floor> <Amount> §e- §fCalculate DH price totals for a floor", "c!calcdhprice ", "§7Click to paste c!calcdhprice"));
     ChatLib.chat(suggestable("§8• §ac!warp §e- §fWarp the party after a countdown (Editable in Config)", "c!warp", "§7Click to paste c!warp"));
     ChatLib.chat(suggestable("§8• §ac!stop §e- §fStop a party warp (Only when countdown is still active)", "c!stop", "§7Click to paste c!stop"));
-    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_5", "&cClick to open Help Page 1!"));
+    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_5", "&cClick to open Help Page 5!"));
     ChatLib.chat("&e&m===================================");
   }
 
   if (sub === "help_5") {
     ChatLib.chat("&e&m===================================");
-    ChatLib.chat("&a&lCelebimew's Addons RPC Commands: &e&l[5/5]");
+    ChatLib.chat("&a&lCelebimew's Addons RPC Commands: &e&l[5/6]");
     ChatLib.chat(suggestable("§8• §a/startrpchelper §e- §fRun the Discord Rich Presence helper", "/startrpchelper", "§7Click to paste /startrpchelper"));
     ChatLib.chat(suggestable("§8• §a/stoprpchelper §e- §fStop the Rich Presence helper", "/stoprpchelper", "§7Click to paste /stoprpchelper"));
     ChatLib.chat(suggestable("§8• §a/clearrpchelper §e- §fOnly use this if helper wont start", "/clearrpchelper", "§7Click to paste /clearrpchelper"));
+    ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_6", "&cClick to open Help Page 6!"));
+    ChatLib.chat("&e&m===================================");
+  }
+
+  if (sub === "help_6") {
+    ChatLib.chat("&e&m===================================");
+    ChatLib.chat("&a&lCelebimew's Addons Misc Commands: &e&l[6/6]");
+    ChatLib.chat(suggestable("§8• §a/namehistory <username> §e- §fView the username history for a user", "/namehistory ", "§7Click to paste /namehistory"));
     ChatLib.chat(clickable("&e&l[NEXT]", "/cba help_1", "&cClick to open Help Page 1!"));
     ChatLib.chat("&e&m===================================");
   }
@@ -262,7 +272,9 @@ function runWarpCountdown() {
   } else {
     warpCountdown = null;
     ChatLib.say("/pc CBA >> Warping now!");
-    ChatLib.command("p warp");
+    setTimeout(() => {
+      ChatLib.command("p warp");
+    }, 1000);
   }
 }
 
@@ -491,12 +503,11 @@ calcdhprice: (args) => {
       }, 500);
     }
   },
-  warp: () => {
+  warp: () => { 
     if (warpCountdown !== null) {
       ChatLib.say("/pc CBA >> Delayed Warp is already in progress.");
       return;
     }
-
     countdownTime = config.party_warp_delay;
     warpCancelled = false;
     runWarpCountdown();
@@ -512,7 +523,7 @@ calcdhprice: (args) => {
   },
 
   help: () => {
-    ChatLib.command("CBA >> Party commands: c!price <floor>, c!calcprice <floor> <amount>, c!dhprice <floor>, c!calcdhprice <floor> <amount>, c!warp, c!stop")
+    ChatLib.command("pc CBA >> Party commands: c!price <floor>, c!calcprice <floor> <amount>, c!dhprice <floor>, c!calcdhprice <floor> <amount>, c!warp, c!stop")
   }
 };
 
@@ -1007,6 +1018,85 @@ function updateCarryProgress(floor) {
   });
 }
 
+register("command", (name) => {
+  const DEBUG = true;
+  const d = (...args) => DEBUG && console.log("[CBA:namehistory]", ...args);
+
+  ChatLib.chat("&aCBA >> Fetching username history...");
+
+  if (!name) {
+    ChatLib.chat("&cCBA >> Error: Name not specified");
+    return;
+  }
+
+  const url = "https://crafty.gg/players/" + name + ".json";
+  d("Requesting:", url);
+
+  request({
+    url,
+    headers: { "User-Agent": "CBAddons/1.0" },
+    json: true,
+  })
+    .then((response) => {
+      try {
+        if (!response || !Array.isArray(response.usernames) || response.usernames.length === 0) {
+          d("No usernames array or empty.", { hasResponse: !!response });
+          ChatLib.chat("&cCBA >> No name history found.");
+          return;
+        }
+
+        const history = response.usernames;
+        d("History length:", history.length);
+        d("First two (if present):", history[0]?.username, history[1]?.username);
+
+        ChatLib.chat("&e&l=========================");
+
+        ChatLib.chat("&e&l" + history[0].username + " &7- &9Current username");
+        d("Printed current:", history[0].username);
+
+        let markedSecondAsRead = false;
+
+        if (history.length > 2) {
+          for (let i = 1; i < history.length - 1; i++) {
+            const entry = history[i];
+            const raw = entry?.changed_at;
+            const changed_at = (typeof raw === "string" && raw.includes("T"))
+              ? raw.split("T")[0]
+              : (raw ? String(raw) : "Unknown date");
+
+            d("Loop i=", i, "username=", entry?.username, "raw_changed_at=", raw, "parsed=", changed_at);
+
+            if (i === 1 && !markedSecondAsRead) {
+              markedSecondAsRead = true;
+              d("Marked second entry as read:", entry?.username);
+            }
+
+            ChatLib.chat("&e&l" + entry.username + " &7- &9" + changed_at);
+            d("Printed i=", i);
+          }
+        } else {
+          d("No middle entries to print (length <= 2).");
+        }
+
+        if (history.length > 1) {
+          const original = history[history.length - 1];
+          ChatLib.chat("&e&l" + original.username + " &7- &9Original name");
+          d("Printed original:", original.username);
+        }
+
+        ChatLib.chat("&e&l=========================");
+        d("Done");
+      } catch (innerErr) {
+        console.log(innerErr);
+        ChatLib.chat("&cCBA >> An error occurred (inner).");
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      ChatLib.chat("&cCBA >> An error occurred");
+    });
+}).setName("namehistory").setAliases("name");
+
 register("chat", (msg, event) => {
   if (!config.util_autoparty && config.util_autoparty_all) return;
 
@@ -1027,13 +1117,25 @@ register("chat", (msg, event) => {
     const lowerUsername = username.toLowerCase();
     const whitelist = config.getWhitelist();
 
-    if (!whitelist.includes(lowerUsername)) {
+    if (!config.util_autoparty_all && !whitelist.includes(lowerUsername)) {
       ChatLib.chat(`&c[CBA] Ignored party invite from &7${username} &cbecause they're not in your whitelist.`);
       return;
     }
 
-    ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
-    ChatLib.command(`p accept ${username}`);
+    if (!config.util_autoparty) {
+      ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
+      ChatLib.command(`p accept ${username}`);
+
+      const confirmation = register("chat", (joinMsg, e) => {
+        const joined = ChatLib.removeFormatting(joinMsg);
+        if (joined.includes(`You have joined ${username}'s party!`)) {
+          if (!config.util_autoparty_all) {
+            ChatLib.command(`pc CBA >> Auto party accepted invite from ${username}!`);
+          }
+          confirmation.unregister();
+        }
+      });
+    }
   }
 }).setCriteria("${message}");
 
@@ -1051,6 +1153,37 @@ register("chat", (msg, event) => {
     if (username) {
       ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
       ChatLib.command(`p accept ${username}`);
+
+      const confirmation = register("chat", (joinMsg, e) => {
+        const joined = ChatLib.removeFormatting(joinMsg);
+        if (joined.includes(`You have joined ${username}'s party!`)) {
+          ChatLib.command(`pc CBA >> Auto party accepted invite from ${username}!`);
+          confirmation.unregister();
+        }
+      });
+    } else {
+      ChatLib.chat("&c[CBA] Failed to extract username.");
+    }
+  }
+}).setCriteria("${message}");
+
+register("chat", (msg, event) => {
+  if (!config.util_autoparty_all || !config.util_autoparty) return;
+  const cleaned = ChatLib.removeFormatting(msg);
+
+  if (
+    cleaned.includes("has invited you to join their party!") &&
+    cleaned.includes("Click here to join!")
+  ) {
+    const match = cleaned.match(/\] (.+) has invited you to join their party!/);
+    const username = match ? match[1] : null;
+
+    if (username) {
+      ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
+      ChatLib.command(`p accept ${username}`);
+      setTimeout(() => {
+        ChatLib.command(`pc CBA >> Auto party accepted invite from ${username}!`);
+      }, 1000);
     } else {
       ChatLib.chat("&c[CBA] Failed to extract username.");
     }
@@ -1156,12 +1289,14 @@ register("chat", (message) => {
 }).setCriteria("${message}");
 
 onChatPacket(() => {
+  ChatLib.chat("&2CBA &7>> &cBlood Ready to Clear!");
   if (config.dungeon_blood_ready) {
     ChatLib.command("pc CBA >> Blood Ready to Clear!");
   }
 }).setCriteria("[BOSS] The Watcher: That will be enough for now.");
 
 onChatPacket(() => {
+  ChatLib.chat("&2CBA &7>> &cBlood Done!");
   if (config.dungeon_blood_done) {
     ChatLib.command("pc CBA >> Blood Done!");
   }
@@ -1175,4 +1310,9 @@ register("chat", (message) => {
 register("chat", (message) => {
   if (config.util_autotip && /Sending you to .*!/.test(message))
     ChatLib.command("tip all")
+}).setCriteria("${message}");
+
+register("chat", (message, event) => {
+  if (/You already tipped everyone that has boosters active, so there isn't anybody to be tipped right now!/.test(message))
+    cancel(event);
 }).setCriteria("${message}");
