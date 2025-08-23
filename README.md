@@ -32,10 +32,17 @@ Chattriggers module for tracking dungeon carries!
 `/startrpchelper` - Run the Discord Rich Presence helper.<br>
 `/stoprpchelper` - Stop the Discord Rich Presence helper.<br>
 `/clearrpchelper` - Only run this command if the helper refuses to launch.<br>
+### Misc Commands
+`/namehistory <username>` - View the username history for a user<br>
 ## Party Commands
 ### Price Checkers
+`c!help` - Show party commands<br>
 `c!price <floor>` - List Skyblock Maniacs (SBM) Prices for a floor.<br>
+`c!dhprice <Floor>` - List DH prices for a floor<br>
 `c!calcprice <floor> <amount>` - Calculate the total price for multiple runs on a floor.<br>
+`c!calcdhprice <Floor> <Amount>` - Calculate DH price totals for a floor<br>
+`c!warp` - Warp the party after a countdown (Editable in Config)<br>
+`c!stop` - Stop a party warp (Only when countdown is still active)<br>
 ## Guild Commands
 Coming Soon!
 # Discord Rich Presence
