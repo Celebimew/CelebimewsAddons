@@ -1,5 +1,5 @@
 # Celebimews Addons
-Chattriggers module for tracking dungeon carries!
+Chattriggers module that used to only be for tracking dungeon carries but with other features now!
 # How to install
 ## Manual Install
 1. Install [Chattriggers](https://chattriggers.com/)
