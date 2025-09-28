@@ -201,12 +201,29 @@ function checkForUpdates() {
 
       const latest = match[1];
 
-      if (CURRENT_VERSION === latest) {
+      const compareVersions = (a, b) => {
+        const pa = a.split(".").map(Number);
+        const pb = b.split(".").map(Number);
+        for (let i = 0; i < 3; i++) {
+          if (pa[i] > pb[i]) return 1;
+          if (pa[i] < pb[i]) return -1;
+        }
+        return 0;
+      };
+
+      const comparison = compareVersions(CURRENT_VERSION, latest);
+
+      if (comparison === 0) {
         ChatLib.chat(`&a&l[CBAddons] &aYou're on the latest version: &d&l${CURRENT_VERSION}`);
-      } else {
+      } else if (comparison < 0) {
         ChatLib.chat(`&6[CBAddons] Update available!`);
         ChatLib.chat(`&eCurrent: &d&l${CURRENT_VERSION} &8| &aLatest: &d&l${latest}`);
         ChatLib.chat(`https://github.com/Celebimew/CelebimewsAddons/releases/latest`);
+      } else {
+        setTimeout(() => ChatLib.chat("&a&lCBA >> &rhmm... this isnt right..."), 1000);
+        setTimeout(() => ChatLib.chat(`&a&lCBA >> &rthe version in your metadata is higher than the latest release...`), 3000);
+        setTimeout(() => ChatLib.chat("&a&lCBA >> &rmaybe you're a time traveler?"), 5000);
+        setTimeout(() => ChatLib.chat("&a&lCBA >> &rwait... did you mess with the metadata file? please dont mess with the metadata file... you might miss important updates!"), 7000);
       }
     })
     .catch(e => {
@@ -689,39 +706,174 @@ register("worldLoad", () => {
   dungeonStarted = false;
 });
 
+function getSuperboomCount() {
+  let inv = Player.getInventory().getItems();
+  let count = 0;
+
+  inv.forEach(item => {
+    if (item && item.getName().removeFormatting().includes("Superboom TNT")) {
+      count += item.getStackSize();
+    }
+  });
+
+  return count;
+}
+function getSpiritLeapCount() {
+  let inv = Player.getInventory().getItems();
+  let count = 0;
+
+  inv.forEach(item => {
+    if (item && item.getName().removeFormatting().includes("Spirit Leap")) {
+      count += item.getStackSize();
+    }
+  });
+
+  return count;
+}
+function getEnderPearlCount() {
+  let inv = Player.getInventory().getItems();
+  let count = 0;
+
+  inv.forEach(item => {
+    if (item && item.getName().removeFormatting().includes("Ender Pearl")) {
+      count += item.getStackSize();
+    }
+  });
+
+  return count;
+}
+function getDecoyCount() {
+  let inv = Player.getInventory().getItems();
+  let count = 0;
+
+  inv.forEach(item => {
+    if (item && item.getName().removeFormatting().includes("Decoy")) {
+      count += item.getStackSize();
+    }
+  });
+
+  return count;
+}
+function getTrapCount() {
+  let inv = Player.getInventory().getItems();
+  let count = 0;
+
+  inv.forEach(item => {
+    if (item && item.getName().removeFormatting().includes("Trap")) {
+      count += item.getStackSize();
+    }
+  });
+
+  return count;
+}
+
+let commandQueue = [];
+let isProcessing = false;
+
+function processQueue() {
+  if (commandQueue.length === 0) {
+    isProcessing = false;
+    return;
+  }
+  isProcessing = true;
+
+  let nextCommand = commandQueue.shift();
+  nextCommand();
+
+  setTimeout(processQueue, 2000);
+}
+
+function queueCommand(fn) {
+  commandQueue.push(fn);
+  if (!isProcessing) processQueue();
+}
+
 register("command", () => {
-  if (config.dungeon_sacks_commands) {
-    ChatLib.command("gfs spirit_leap 16", false);
+  if (!config.dungeon_sacks_commands) return;
+
+  let amount = getSpiritLeapCount();
+
+  if (amount < 16) {
+    let needed = 16 - amount;
+    queueCommand(() => {
+      ChatLib.chat(`&2CBA &7» &6Getting &e${needed} &bSpirit &9Leaps &6from sacks...`);
+      ChatLib.command(`gfs spirit_leap ${needed}`, false);
+    });
+  } else {
+    ChatLib.chat("&2CBA &7» &aYou already have at least 16 Spirit Leaps!");
   }
 }).setCommandName("spiritleap").setAliases("sl", "sp", "spl", "spirit", "leaps", "spiritleaps", "leap", "spirit_leap", "spirit_leaps");
 
 register("command", () => {
-  if (config.dungeon_sacks_commands) {
-    ChatLib.command("gfs ender_pearl 16", false);
+  if (!config.dungeon_sacks_commands) return;
+
+  let amount = getEnderPearlCount();
+
+  if (amount < 16) {
+    let needed = 16 - amount;
+    queueCommand(() => {
+      ChatLib.chat(`&2CBA &7» &6Getting &e${needed} &5Ender &fPearls &6from sacks...`);
+      ChatLib.command(`gfs ender_pearl ${needed}`, false);
+    });
+  } else {
+    ChatLib.chat("&2CBA &7» &aYou already have at least 16 Ender Pearls!");
   }
 }).setCommandName("enderpearl").setAliases("ep", "epearl", "ender", "pearls", "pearl", "enderpearls", "epearls", "ender_pearls");
 
 register("command", () => {
-  if (config.dungeon_sacks_commands) {
-    ChatLib.command("gfs superboom_tnt 64", false);
+  if (!config.dungeon_sacks_commands) return;
+
+  let amount = getSuperboomCount();
+
+  if (amount < 64) {
+    let needed = 64 - amount;
+    queueCommand(() => {
+      ChatLib.chat(`&2CBA &7» &6Getting &e${needed} &cSuper&fbooms &6from sacks...`);
+      ChatLib.command(`gfs superboom_tnt ${needed}`, false);
+    });
+  } else {
+    ChatLib.chat("&2CBA &7» &aYou already have at least 64 Superboom TNT!");
   }
 }).setCommandName("superboom").setAliases("tnt", "boom", "superbooms", "superboomtnt", "super_boom", "superboom_tnt", "superb", "booms");
 
 register("command", () => {
   if (config.dungeon_sacks_commands) {
-    ChatLib.command("gfs architect_first_draft 1", false);
+    queueCommand(() => {
+      ChatLib.chat("&2CBA &7» &6Getting 1 &9Architect's &5First Draft &6from sacks...");
+      ChatLib.command("gfs architect_first_draft 1", false);
+    });
   }
 }).setCommandName("architectsdraft").setAliases("draft", "drafts", "architectsdrafts", "architect", "firstdraft");
 
 register("command", () => {
-  if (config.dungeon_sacks_commands) {
-    ChatLib.command("gfs decoy 64", false);
+  if (!config.dungeon_sacks_commands) return;
+
+  let amount = getDecoyCount();
+
+  if (amount < 64) {
+    let needed = 64 - amount;
+    queueCommand(() => {
+      ChatLib.chat(`&2CBA &7» &6Getting &e${needed} &fDecoys &6from sacks...`);
+      ChatLib.command(`gfs decoy ${needed}`, false);
+    });
+  } else {
+    ChatLib.chat("&2CBA &7» &aYou already have at least 64 Decoys!");
   }
 }).setCommandName("decoy").setAliases("decoys", "dungeondecoys");
 
 register("command", () => {
-  if (config.dungeon_sacks_commands) {
-    ChatLib.command("gfs trap 64", false);
+  if (!config.dungeon_sacks_commands) return;
+
+  let amount = getTrapCount();
+
+  if (amount < 64) {
+    let needed = 64 - amount;
+    queueCommand(() => {
+      ChatLib.chat(`&2CBA &7» &6Getting &e${needed} &fTraps &6from sacks...`);
+      ChatLib.command(`gfs trap ${needed}`, false);
+    });
+  } else {
+    ChatLib.chat("&2CBA &7» &aYou already have at least 64 Traps!");
   }
 }).setCommandName("trap").setAliases("traps", "dungeontraps", "dungeontrap");
 
@@ -1098,7 +1250,7 @@ register("command", (name) => {
 }).setName("namehistory").setAliases("name");
 
 register("chat", (msg, event) => {
-  if (!config.util_autoparty && config.util_autoparty_all) return;
+  if (!config.util_autoparty || config.util_autoparty_all) return;
 
   const cleaned = ChatLib.removeFormatting(msg);
 
@@ -1117,53 +1269,16 @@ register("chat", (msg, event) => {
     const lowerUsername = username.toLowerCase();
     const whitelist = config.getWhitelist();
 
-    if (!config.util_autoparty_all && !whitelist.includes(lowerUsername)) {
+    if (!whitelist.includes(lowerUsername)) {
       ChatLib.chat(`&c[CBA] Ignored party invite from &7${username} &cbecause they're not in your whitelist.`);
       return;
     }
 
-    if (!config.util_autoparty) {
-      ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
-      ChatLib.command(`p accept ${username}`);
-
-      const confirmation = register("chat", (joinMsg, e) => {
-        const joined = ChatLib.removeFormatting(joinMsg);
-        if (joined.includes(`You have joined ${username}'s party!`)) {
-          if (!config.util_autoparty_all) {
-            ChatLib.command(`pc CBA >> Auto party accepted invite from ${username}!`);
-          }
-          confirmation.unregister();
-        }
-      });
-    }
-  }
-}).setCriteria("${message}");
-
-register("chat", (msg, event) => {
-  if (!config.util_autoparty_all || !config.util_autoparty) return;
-  const cleaned = ChatLib.removeFormatting(msg);
-
-  if (
-    cleaned.includes("has invited you to join their party!") &&
-    cleaned.includes("Click here to join!")
-  ) {
-    const match = cleaned.match(/\] (.+) has invited you to join their party!/);
-    const username = match ? match[1] : null;
-
-    if (username) {
-      ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
-      ChatLib.command(`p accept ${username}`);
-
-      const confirmation = register("chat", (joinMsg, e) => {
-        const joined = ChatLib.removeFormatting(joinMsg);
-        if (joined.includes(`You have joined ${username}'s party!`)) {
-          ChatLib.command(`pc CBA >> Auto party accepted invite from ${username}!`);
-          confirmation.unregister();
-        }
-      });
-    } else {
-      ChatLib.chat("&c[CBA] Failed to extract username.");
-    }
+    ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
+    ChatLib.command(`p accept ${username}`);
+    setTimeout(() => {
+      ChatLib.command(`pc CBA >> Auto party ran the command: /p accept ${username}!`);
+    }, 1000);
   }
 }).setCriteria("${message}");
 
@@ -1182,7 +1297,7 @@ register("chat", (msg, event) => {
       ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
       ChatLib.command(`p accept ${username}`);
       setTimeout(() => {
-        ChatLib.command(`pc CBA >> Auto party accepted invite from ${username}!`);
+        ChatLib.command(`pc CBA >> Auto party ran the command: /p accept ${username}!`);
       }, 1000);
     } else {
       ChatLib.chat("&c[CBA] Failed to extract username.");
@@ -1289,14 +1404,14 @@ register("chat", (message) => {
 }).setCriteria("${message}");
 
 onChatPacket(() => {
-  ChatLib.chat("&2CBA &7>> &cBlood Ready to Clear!");
+  ChatLib.chat("&2CBA &7» &cBlood Ready to Clear!");
   if (config.dungeon_blood_ready) {
     ChatLib.command("pc CBA >> Blood Ready to Clear!");
   }
 }).setCriteria("[BOSS] The Watcher: That will be enough for now.");
 
 onChatPacket(() => {
-  ChatLib.chat("&2CBA &7>> &cBlood Done!");
+  ChatLib.chat("&2CBA &7» &cBlood Done!");
   if (config.dungeon_blood_done) {
     ChatLib.command("pc CBA >> Blood Done!");
   }
@@ -1316,3 +1431,10 @@ register("chat", (message, event) => {
   if (/You already tipped everyone that has boosters active, so there isn't anybody to be tipped right now!/.test(message))
     cancel(event);
 }).setCriteria("${message}");
+
+onChatPacket(() => {
+  ChatLib.chat("&2CBA &7» &e+1 Bonus Score! (Reborn attribute)");
+  if (config.attribute_reborn) {
+    ChatLib.command("pc CBA >> Prince got assasinated! +1 Bonus Score!");
+  }
+}).setCriteria("A Prince falls. +1 Bonus Score");
