@@ -9,7 +9,7 @@ import {
 
 @Vigilant("CBAddons", "Celebimew's Addons", {
   getCategoryComparator: () => (a, b) => {
-    const order = ["Config", "GUIs", "Dungeons", "Commands", "Party Commands", "Messages", "Utilities", "Client Mode", "Discord", "Other"];
+    const order = ["Config", "GUIs", "Dungeons", "Commands", "Party Commands", "Messages", "Attributes", "Utilities", "Client Mode", "Discord", "Other"];
     return order.indexOf(a.name) - order.indexOf(b.name);
   }
 })
@@ -84,24 +84,17 @@ class Settings {
 
   @SwitchProperty({
     name: "Auto Warp",
-    description: "Automatically warp the party at the start of every run.",
+    description: "Automatically warp the party at the start of every run (Including kuudra).",
     category: "Dungeons"
   })
   dungeon_auto_warp = false;
 
   @SwitchProperty({
-    name: "Auto Pot",
-    description: "Automatically open your Potion Bag at the start of every run.",
+    name: "Reborn Attribute",
+    description: `Announce whenever you get an extra score from a prince with the reborn attribute.`,
     category: "Dungeons"
   })
-  dungeon_auto_pot = false;
-
-  @SwitchProperty({
-    name: "Dungeon Sacks Shortcut",
-    description: "Enable dungeon sacks shortcut commands like /boom or /sl.",
-    category: "Dungeons"
-  })
-  dungeon_sacks_commands = true;
+  attribute_reborn = true;
 
   @SwitchProperty({
     name: "Blood Ready",
@@ -116,6 +109,20 @@ class Settings {
     category: "Dungeons"
   })
   dungeon_blood_done = true;
+
+  @SwitchProperty({
+    name: "Auto Potion",
+    description: "Automatically open your Potion Bag at the start of every run.",
+    category: "Dungeons"
+  })
+  dungeon_auto_pot = false;
+
+  @SwitchProperty({
+    name: "Dungeon Sacks Shortcut",
+    description: "Enable dungeon sacks shortcut commands like /boom or /sl.",
+    category: "Dungeons"
+  })
+  dungeon_sacks_commands = true;
 
   @SwitchProperty({
     name: "Autokick (Coming Soon)",
@@ -186,7 +193,7 @@ class Settings {
     category: "Messages"
   })
   chat_hide_arachne_brood = true;
-  
+
   @SwitchProperty({
     name: "Auto Tip",
     description: `Automatically tips all players when swapping servers.`,
@@ -348,9 +355,8 @@ class Settings {
       category: "Other",
       placeholder: "Check"
     })
-    checkUpdates() {
+    checkupdates() {
       const CURRENT_VERSION = JSON.parse(FileLib.read("CBAddons", "metadata.json")).version;
-
       const { request } = require("requestV2");
 
       request({
@@ -371,19 +377,34 @@ class Settings {
 
           const latest = match[1];
 
-          if (CURRENT_VERSION === latest) {
+          const compareVersions = (a, b) => {
+            const pa = a.split(".").map(Number);
+            const pb = b.split(".").map(Number);
+            for (let i = 0; i < 3; i++) {
+              if (pa[i] > pb[i]) return 1;
+              if (pa[i] < pb[i]) return -1;
+            }
+            return 0;
+          };
+
+          const comparison = compareVersions(CURRENT_VERSION, latest);
+
+          if (comparison === 0) {
             ChatLib.chat(`&a&l[CBAddons] &aYou're on the latest version: &d&l${CURRENT_VERSION}`);
-          } else {
+          } else if (comparison < 0) {
             ChatLib.chat(`&6[CBAddons] Update available!`);
             ChatLib.chat(`&eCurrent: &d&l${CURRENT_VERSION} &8| &aLatest: &d&l${latest}`);
             ChatLib.chat(`https://github.com/Celebimew/CelebimewsAddons/releases/latest`);
+          } else {
+            setTimeout(() => ChatLib.chat("&a&lCBA >> &rhmm... this isnt right..."), 1000);
+            setTimeout(() => ChatLib.chat(`&a&lCBA >> &rthe version in your metadata is higher than the latest release...`), 3000);
+            setTimeout(() => ChatLib.chat("&a&lCBA >> &rmaybe you're a time traveler?"), 5000);
+            setTimeout(() => ChatLib.chat("&a&lCBA >> &rwait... did you mess with the metadata file? please dont mess with the metadata file... you might miss important updates!"), 7000);
           }
         })
         .catch(e => {
           ChatLib.chat("&c&l[CBAddons] &cFailed to check for updates.");
         });
-
-          Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
     }
 
   constructor() {
