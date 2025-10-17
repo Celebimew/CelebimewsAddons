@@ -1274,7 +1274,7 @@ register("chat", (msg, event) => {
       return;
     }
 
-    ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
+    ChatLib.chat(`&9&l[&a&lCBA&9&l] &aAccepting party invite from &b${username}&a...`);
     ChatLib.command(`p accept ${username}`);
     setTimeout(() => {
       ChatLib.command(`pc CBA >> Auto party ran the command: /p accept ${username}!`);
@@ -1294,7 +1294,7 @@ register("chat", (msg, event) => {
     const username = match ? match[1] : null;
 
     if (username) {
-      ChatLib.chat(`&a[CBA] Accepting party invite from &b${username}&a...`);
+      ChatLib.chat(`&9&l[&a&lCBA&9&l] &aAccepting party invite from &b${username}&a...`);
       ChatLib.command(`p accept ${username}`);
       setTimeout(() => {
         ChatLib.command(`pc CBA >> Auto party ran the command: /p accept ${username}!`);
@@ -1438,3 +1438,85 @@ onChatPacket(() => {
     ChatLib.command("pc CBA >> Prince got assasinated! +1 Bonus Score!");
   }
 }).setCriteria("A Prince falls. +1 Bonus Score");
+
+let lastTriggerTime = 0;
+let timeout = null;
+
+register("chat", (event) => {
+  if (!config.fear_speaking) return;
+  const message = ChatLib.removeFormatting(ChatLib.getChatMessage(event, true));
+
+  const triggers = [
+    /^\[FEAR\] Public Speaking Demon: Speak .+!$/i,
+    /^\[FEAR\] Public Speaking Demon: Say something interesting .+!$/i
+  ];
+
+  if (triggers.some(regex => regex.test(message))) {
+    const now = Date.now();
+
+    if (now - lastTriggerTime < 5000) return;
+    lastTriggerTime = now;
+
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      const randomNum = Math.floor(100000 + Math.random() * 900000);
+      ChatLib.say(`/ac cba-speakingdemon-${randomNum}`);
+      ChatLib.chat("&9&l[&a&lCBA&9&l] &aPublic Speaking Demon Solved!");
+    }, 1000);
+  }
+});
+
+register("chat", (event) => {
+  if (!config.fear_math) return;
+  const message = ChatLib.removeFormatting(ChatLib.getChatMessage(event, true));
+
+  const match = message.match(/QUICK MATHS! Solve: (.+)/i);
+  if (match) {
+    const rawExpression = match[1];
+
+    const expression = rawExpression
+      .replace(/×/g, "*")
+      .replace(/[xX]/g, "*")
+      .replace(/÷/g, "/")
+      .replace(/[^0-9+\-*/().]/g, "");
+
+    try {
+      const answer = eval(expression);
+      ChatLib.chat(`&9&l[&a&lCBA&9&l] &aPrimal Fear Answer: &b${answer}`);
+    } catch (err) {
+      ChatLib.chat(`&c[CBA] Could not solve: &f${rawExpression}`);
+    }
+  }
+});
+
+register("chat", (event) => {
+  const message = ChatLib.removeFormatting(ChatLib.getChatMessage(event, true)).trim();
+
+  if (message.includes("FEAR. A Primal Fear has been summoned!")) {
+    if (!config.fear_primal) return;
+
+    let fearStat = config.fear_stat ?? 0;
+    let baseTime = 6 * 60 + 1;
+
+    ChatLib.chat(`&9&l[&a&lCBA&9&l] &dPrimal Fear &acounter started! Your &5&lFear &ais set to: &5&l${fearStat}&a! Change this in config!`);
+      Client.showTitle("&dPRIMAL FEAR SPAWNED!", "&dPrimal Fear &7tracker started!", 10, 60, 10);
+    World.playSound("mob.enderdragon.growl", 100, 1);
+
+    if (fearStat >= 120) {
+      ChatLib.chat("&9&l[&a&lCBA&9&l] &aYou set your &5&lFear &acounter config to &5%l120&a! Which means there is no cooldown! Congrats!");
+      return;
+    }
+
+    let timeToWait = baseTime - (fearStat * 3);
+    if (timeToWait < 0) timeToWait = 0;
+
+    setTimeout(() => {
+      ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acounter has ended! You can now spawn another &dPrimal Fear&a!");
+        Client.showTitle("&dPRIMAL FEAR READY!", "&7You can now spawn another &dPrimal Fear&a!", 10, 60, 10);
+      World.playSound("random.levelup", 100, 1);
+      World.playSound("mob.enderdragon.growl", 100, 0.1);
+    }, timeToWait * 1000);
+  }
+});
+  
