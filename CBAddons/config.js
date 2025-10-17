@@ -9,7 +9,7 @@ import {
 
 @Vigilant("CBAddons", "Celebimew's Addons", {
   getCategoryComparator: () => (a, b) => {
-    const order = ["Config", "GUIs", "Dungeons", "Commands", "Party Commands", "Messages", "Attributes", "Utilities", "Client Mode", "Discord", "Other"];
+    const order = ["Config", "GUIs", "Dungeons", "Commands", "Party Commands", "Messages", "Attributes", "Utilities", "Primal Fear", "Client Mode", "Discord", "Other"];
     return order.indexOf(a.name) - order.indexOf(b.name);
   }
 })
@@ -221,6 +221,36 @@ class Settings {
     category: "Utilities"
   })
   util_autoparty_list = "Celebimew, Caelvoria";
+
+  @SwitchProperty({
+    name: "Primal Fear",
+    description: "Tells you when the primal fear cooldown is over. Set your fear stat below",
+    category: "Primal Fear"
+  })
+  fear_primal = false
+
+  @SliderProperty({
+    name: "Fear Stat",
+    description: "Set your fear stat for the Primal Fear cooldown tracker.",
+    category: "Primal Fear",
+    min: 0,
+    max: 120
+  })
+  fear_stat = 0;
+
+  @SwitchProperty({
+    name: "Public Speaking Demon",
+    description: "Automatically send a message to help with the Public Speaking Demon.",
+    category: "Primal Fear"
+  })
+  fear_speaking = false
+
+  @SwitchProperty({
+    name: "Math Teacher",
+    description: "Solve the math problem from the math teacher.",
+    category: "Primal Fear"
+  })
+  fear_math = false
 
   @SwitchProperty({
       name: "Discord Rich Presence",
