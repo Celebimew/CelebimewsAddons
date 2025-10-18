@@ -69,8 +69,7 @@ class Settings {
     description: "Toggle the carry tracker display.",
     category: "GUIs"
   })
-  carry_gui_enabled = true;
-
+  carry_gui_enabled = false;
   @ButtonProperty({
     name: "Carry GUI Position",
     description: "Edit the carry GUI's location on the screen.",
@@ -79,6 +78,24 @@ class Settings {
   })
   commandsGuiCarry() {
     ChatLib.command("cba gui_carry", true);
+    Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
+  }
+
+  @SwitchProperty({
+    name: "Primal Fear GUI",
+    description: "Toggle the Primal Fear tracker display.",
+    category: "GUIs"
+  })
+  fear_gui = false;
+
+  @ButtonProperty({
+    name: "Primal Fear GUI Position",
+    description: "Edit the Primal Fear GUI's location on the screen.",
+    category: "GUIs",
+    placeholder: "Edit"
+  })
+  commandsGuiFear() {
+    ChatLib.command("cba gui_fear", true);
     Java.type("net.minecraft.client.Minecraft").func_71410_x().func_147108_a(null);
   }
 
