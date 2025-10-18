@@ -1531,10 +1531,12 @@ register("chat", (event) => {
       }
     }, 1000);
 
+    setTimeout(() => {
     ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acooldown has ended! You can now spawn another &dPrimal Fear&a!");
     Client.showTitle("&dPRIMAL FEAR READY!", "&7You can now spawn another &dPrimal Fear&a!", 10, 60, 10);
     World.playSound("mob.enderdragon.growl", 100, 0.1);
     fear_cooldown = 0;
+    }, fear_cooldown * 1000);
   }
 });
 
@@ -1601,5 +1603,3 @@ function formatTime(seconds) {
   const s = Math.floor(seconds % 60);
   return `${m}m ${s}s`;
 }
-
-
