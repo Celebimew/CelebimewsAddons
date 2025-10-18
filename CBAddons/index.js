@@ -177,6 +177,11 @@ register("command", (...args) => {
     ChatLib.chat("&a&lCBA >> &aIn carry GUI editor. Drag to move, Press ESC to finish.")
   }
 
+  if (sub === "gui_fear") {
+    fearGuiMove.open()
+    ChatLib.chat("&a&lCBA >> &aIn Primal Fear GUI editor. Drag to move, Press ESC to finish.")
+  }
+
 }).setName("cba").setAliases("celebimewsaddons", "celebimewaddons", "cbaddons");
 
 function checkForUpdates() {
@@ -1483,12 +1488,15 @@ register("chat", (event) => {
 
     try {
       const answer = eval(expression);
-      ChatLib.chat(`&9&l[&a&lCBA&9&l] &aPrimal Fear Answer: &b${answer}`);
+      ChatLib.chat(`&9&l[&a&lCBA&9&l] &dPrimal Fear &aAnswer: &b${answer}`);
     } catch (err) {
       ChatLib.chat(`&c[CBA] Could not solve: &f${rawExpression}`);
     }
   }
 });
+
+let fear_cooldown = 0;
+let fear_amount = 0;
 
 register("chat", (event) => {
   const message = ChatLib.removeFormatting(ChatLib.getChatMessage(event, true)).trim();
@@ -1497,26 +1505,100 @@ register("chat", (event) => {
     if (!config.fear_primal) return;
 
     let fearStat = config.fear_stat ?? 0;
-    let baseTime = 6 * 60 + 1;
+    let baseTime = 6 * 60 + 3;
 
     ChatLib.chat(`&9&l[&a&lCBA&9&l] &dPrimal Fear &acounter started! Your &5&lFear &ais set to: &5&l${fearStat}&a! Change this in config!`);
-      Client.showTitle("&dPRIMAL FEAR SPAWNED!", "&dPrimal Fear &7tracker started!", 10, 60, 10);
+    Client.showTitle("&dPRIMAL FEAR SPAWNED!", "&dPrimal Fear &7cooldown tracker started!", 10, 60, 10);
     World.playSound("mob.enderdragon.growl", 100, 1);
 
     if (fearStat >= 120) {
-      ChatLib.chat("&9&l[&a&lCBA&9&l] &aYou set your &5&lFear &acounter config to &5%l120&a! Which means there is no cooldown! Congrats!");
+      ChatLib.chat("&9&l[&a&lCBA&9&l] &aYou set your &5&lFear &acounter config to &5&l120&a! Which means there is no cooldown! Congrats!");
+      fear_cooldown = 0;
+      fear_amount++;
       return;
     }
 
-    let timeToWait = baseTime - (fearStat * 3);
-    if (timeToWait < 0) timeToWait = 0;
+    fear_cooldown = baseTime - (fearStat * 3);
+    if (fear_cooldown < 0) fear_cooldown = 0;
 
-    setTimeout(() => {
-      ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acounter has ended! You can now spawn another &dPrimal Fear&a!");
-        Client.showTitle("&dPRIMAL FEAR READY!", "&7You can now spawn another &dPrimal Fear&a!", 10, 60, 10);
-      World.playSound("random.levelup", 100, 1);
-      World.playSound("mob.enderdragon.growl", 100, 0.1);
-    }, timeToWait * 1000);
+    fear_amount++;
+
+    const interval = setInterval(() => {
+      if (fear_cooldown <= 0) {
+        clearInterval(interval);
+      } else {
+        fear_cooldown--;
+      }
+    }, 1000);
+
+    setTimeout(() => {ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acounter has ended! You can now spawn another &dPrimal Fear&a!");}, timeToWait * 990);
+    setTimeout(() => {Client.showTitle("&dPRIMAL FEAR READY!", "&7You can now spawn another &dPrimal Fear&a!", 10, 60, 10);}, timeToWait * 980);
+    setTimeout(() => {World.playSound("random.levelup", 100, 1);}, timeToWait * 970);
+    setTimeout(() => {World.playSound("mob.enderdragon.growl", 100, 0.1);}, timeToWait * 970);
+    fear_cooldown = 0;
   }
 });
-  
+
+let fearGuiX = parseInt(FileLib.read(dataPath + "fearGuiX.txt") || "200");
+let fearGuiY = parseInt(FileLib.read(dataPath + "fearGuiY.txt") || "100");
+let lastUpdate = Date.now();
+
+export const fearGuiMove = new Gui();
+
+register("dragged", (dx, dy, x, y) => {
+  if (fearGuiMove.isOpen()) {
+    fearGuiX = x;
+    fearGuiY = y;
+    FileLib.write(dataPath + "fearGuiX.txt", x);
+    FileLib.write(dataPath + "fearGuiY.txt", y);
+  }
+});
+
+register("renderOverlay", () => {
+  if (!config.fear_gui) return;
+
+  const now = Date.now();
+  const delta = (now - lastUpdate) / 1000;
+  lastUpdate = now;
+
+  if (fear_cooldown > 0) {
+    fear_cooldown = Math.max(0, fear_cooldown - delta);
+  }
+
+  const editing = fearGuiMove.isOpen();
+  let x = fearGuiX;
+  let y = fearGuiY;
+
+  if (editing) {
+    Renderer.drawRect(Renderer.color(0, 0, 0, 120), 0, 0, Renderer.screen.getWidth(), Renderer.screen.getHeight());
+  }
+
+  Renderer.drawStringWithShadow("§a§lCBAddons Fear Tracker", x, y);
+  y += 12;
+
+  let primalFearsText =
+    typeof fear_amount === "number" && !isNaN(fear_amount)
+      ? `§7• §d§lPrimal Fears: §6${fear_amount}`
+      : "§7• §d§lPrimal Fears: §cN/A";
+
+  Renderer.drawStringWithShadow(primalFearsText, x, y);
+  y += 12;
+
+  let cooldownText;
+  if (typeof fear_cooldown === "number" && !isNaN(fear_cooldown)) {
+    cooldownText =
+      fear_cooldown > 0
+        ? `§7• §e§lCooldown: §c${formatTime(fear_cooldown)}`
+        : "§7• §e§lCooldown: §a§lAvailable!";
+  } else {
+    cooldownText = "§7• §e§lCooldown: §cN/A";
+  }
+
+  Renderer.drawStringWithShadow(cooldownText, x, y);
+});
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}m ${s}s`;
+}
