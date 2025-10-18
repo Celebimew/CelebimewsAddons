@@ -1,9 +1,8 @@
 {
   "name": "&aCelebimew's Addons",
   "author": "Celebimew",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "description": "QOL Module for Hypixel Skyblock!",
   "entry": "index.js",
   "requires": ["Vigilance", "FileLib", "BloomCore", "RequestV2"]
 }
-
