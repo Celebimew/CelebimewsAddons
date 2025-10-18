@@ -1495,8 +1495,9 @@ register("chat", (event) => {
   }
 });
 
-let fear_cooldown = 0;
 let fear_amount = 0;
+let fear_cooldown = 0;
+let cooldownTimeout = null;
 
 register("chat", (event) => {
   const message = ChatLib.removeFormatting(ChatLib.getChatMessage(event, true)).trim();
@@ -1505,38 +1506,46 @@ register("chat", (event) => {
     if (!config.fear_primal) return;
 
     let fearStat = config.fear_stat ?? 0;
-    let baseTime = 6 * 60 + 3;
+    let baseTime = 6 * 60 + 1;
 
-    ChatLib.chat(`&9&l[&a&lCBA&9&l] &dPrimal Fear &acounter started! Your &5&lFear &ais set to: &5&l${fearStat}&a! Change this in config!`);
-    Client.showTitle("&dPRIMAL FEAR SPAWNED!", "&dPrimal Fear &7cooldown tracker started!", 10, 60, 10);
-    World.playSound("mob.enderdragon.growl", 100, 1);
-
-    if (fearStat >= 120) {
-      ChatLib.chat("&9&l[&a&lCBA&9&l] &aYou set your &5&lFear &astat in config to &5&l120&a! Which means there is no cooldown! Congrats!");
-      fear_cooldown = 0;
-      fear_amount++;
-      return;
+    if (fear_cooldown > 0) {
+      ChatLib.chat("&cCBA >> A new Primal Fear spawned before the previous cooldown ended! Please make sure you set the correct fear stat in config!");
+      Client.showTitle("&cCOOLDOWN OVERRIDDEN!", "&7New Primal Fear cooldown started!", 10, 60, 10);
+      if (cooldownTimeout) clearTimeout(cooldownTimeout);
     }
 
     fear_cooldown = baseTime - (fearStat * 3);
     if (fear_cooldown < 0) fear_cooldown = 0;
 
+    ChatLib.chat(`&9&l[&a&lCBA&9&l] &dPrimal Fear &acounter started! Your &5&lFear &ais set to: &5&l${fearStat}&a! Change this in config!`);
+    Client.showTitle("&dPRIMAL FEAR SPAWNED!", "&dPrimal Fear &7tracker started!", 10, 60, 10);
+      World.playSound("mob.enderdragon.growl", 100, 1);
+
+    if (fearStat >= 120) {
+      ChatLib.chat("&9&l[&a&lCBA&9&l] &aYou set your &5&lFear &acounter config to &5&l120&a! Which means there is no cooldown! Congrats!");
+      fear_cooldown = 0;
+      return;
+    }
+
+    cooldownTimeout = setTimeout(() => {
+      ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acounter has ended! You can now spawn another &dPrimal Fear&a!");
+      Client.showTitle("&dPRIMAL FEAR READY!", "&7You can now spawn another &dPrimal Fear&a!", 10, 60, 10);
+      World.playSound("mob.enderdragon.growl", 100, 0.1);
+      fear_cooldown = 0;
+      cooldownTimeout = null;
+    }, fear_cooldown * 1000);
+  }
+});
+
+register("chat", (event) => {
+  const message = ChatLib.removeFormatting(ChatLib.getChatMessage(event, true)).trim();
+
+  if (message.includes("FEAR. A Primal Fear has been summoned!")) {
+    if (!config.fear_primal) return;
+
     fear_amount++;
 
-    const interval = setInterval(() => {
-      if (fear_cooldown <= 0) {
-        clearInterval(interval);
-      } else {
-        fear_cooldown--;
-      }
-    }, 1000);
-
-    setTimeout(() => {
-    ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acooldown has ended! You can now spawn another &dPrimal Fear&a!");
-    Client.showTitle("&dPRIMAL FEAR READY!", "&7You can now spawn another &dPrimal Fear&a!", 10, 60, 10);
-    World.playSound("mob.enderdragon.growl", 100, 0.1);
-    fear_cooldown = 0;
-    }, fear_cooldown * 1000);
+    ChatLib.chat(`&a[CBA] Primal Fear detected! Current Fear amount: &e${fear_amount}`);
   }
 });
 
@@ -1564,6 +1573,7 @@ register("renderOverlay", () => {
 
   if (fear_cooldown > 0) {
     fear_cooldown = Math.max(0, fear_cooldown - delta);
+    notifiedAvailable = false;
   }
 
   const editing = fearGuiMove.isOpen();
