@@ -1512,7 +1512,7 @@ register("chat", (event) => {
     World.playSound("mob.enderdragon.growl", 100, 1);
 
     if (fearStat >= 120) {
-      ChatLib.chat("&9&l[&a&lCBA&9&l] &aYou set your &5&lFear &acounter config to &5&l120&a! Which means there is no cooldown! Congrats!");
+      ChatLib.chat("&9&l[&a&lCBA&9&l] &aYou set your &5&lFear &astat in config to &5&l120&a! Which means there is no cooldown! Congrats!");
       fear_cooldown = 0;
       fear_amount++;
       return;
@@ -1531,7 +1531,7 @@ register("chat", (event) => {
       }
     }, 1000);
 
-    setTimeout(() => {ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acounter has ended! You can now spawn another &dPrimal Fear&a!");}, timeToWait * 990);
+    setTimeout(() => {ChatLib.chat("&9&l[&a&lCBA&9&l] &aThe &dPrimal Fear &acooldown has ended! You can now spawn another &dPrimal Fear&a!");}, timeToWait * 990);
     setTimeout(() => {Client.showTitle("&dPRIMAL FEAR READY!", "&7You can now spawn another &dPrimal Fear&a!", 10, 60, 10);}, timeToWait * 980);
     setTimeout(() => {World.playSound("random.levelup", 100, 1);}, timeToWait * 970);
     setTimeout(() => {World.playSound("mob.enderdragon.growl", 100, 0.1);}, timeToWait * 970);
@@ -1602,3 +1602,4 @@ function formatTime(seconds) {
   const s = Math.floor(seconds % 60);
   return `${m}m ${s}s`;
 }
+
